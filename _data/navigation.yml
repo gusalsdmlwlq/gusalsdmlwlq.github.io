@@ -1,0 +1,17 @@
+# main links
+main:
+  - title: "개발"
+    url: https://gusalsdmlwlq.github.io/categories/#개발
+  - title: "논문리뷰"
+    url: https://gusalsdmlwlq.github.io/categories/#논문리뷰
+  - title: "지식창고"
+    url: https://gusalsdmlwlq.github.io/categories/#지식창고
+  - title: "About"
+    url: https://gusalsdmlwlq.github.io/about/
+    
+  # - title: "Sample Posts"
+  #   url: /year-archive/
+  # - title: "Sample Collections"
+  #   url: /collection-archive/
+  # - title: "Sitemap"
+  #   url: /sitemap/
