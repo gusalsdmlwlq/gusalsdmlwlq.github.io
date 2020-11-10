@@ -19,22 +19,24 @@ Master of Computer Science & Engineering in POSTECH, Intelligent Software Lab
 
 
 
-## 기술 & 관심분야
+## Skills
 
 - Python & C++
 - Pytorch
 - Tensorflow
 - Scikit-learn
+
+
+
+## Interests
+
 - Machine Learning & Deep Learning
 - Natural Language Processing
-- Dialogue system
-- Question & Answering
-- Text generation
-- Speech recognition
+- Dialog system
 
 
 
-## [CV](https://drive.google.com/open?id=1CtH6NWUKjpiJiz8Fva6LJXW4g_2Y_z06)
+## [CV](https://drive.google.com/file/d/1lYtine3-awSwatL_UmupGJxtK0Jr63zc/view?usp=sharing)
 
 ## [LinkedIn](http://www.linkedin.com/in/jhm9507)
 
