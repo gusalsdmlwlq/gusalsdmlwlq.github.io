@@ -13,7 +13,7 @@ gusalsrhkals@naver.com
 
 https://github.com/gusalsdmlwlq
 
-Bachelor of Computer Science & Engineering in HanYang University ERICA
+Bachelor of Computer Science & Engineering in Hanyang University ERICA
 
 Master of Computer Science & Engineering in POSTECH, Intelligent Software Lab
 
