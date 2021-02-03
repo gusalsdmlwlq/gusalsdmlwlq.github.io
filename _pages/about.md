@@ -32,7 +32,7 @@ Master of Computer Science & Engineering in POSTECH, Intelligent Software Lab
 
 - Machine Learning & Deep Learning
 - Natural Language Processing
-- Dialog system
+- Dialogue system
 
 
 
