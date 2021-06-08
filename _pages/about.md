@@ -175,6 +175,8 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
   Unity3D를 사용하여 모바일 리듬 게임 어플리케이션 개발
 
+  Unity3D & C# 구현 [[Github](https://github.com/gusalsdmlwlq/JeonHyunMin/tree/master/slimebeat)]
+
   <details>
       <summary>리듬 게임 영상</summary>
       <figure class="align-center" style="width:600px">
@@ -182,8 +184,6 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
           <figcaption style="font-size:12px">리듬 게임 영상</figcaption>
       </figure>
   </details>
-
-  Unity3D & C# 구현 [[Github](https://github.com/gusalsdmlwlq/JeonHyunMin/tree/master/slimebeat)]
 
 * **웹 게시판**
 
@@ -237,7 +237,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 ## Contact
 
-gusalsrhkals@naver.com / jhm9507@gmail.com / [jhm9507@postech.ac.kr](mailto:jhm9507@postech.ac.kr)
+[gusalsrhkals@naver.com](mailto:gusalsrhkals@naver.com) / [jhm9507@postech.ac.kr](mailto:jhm9507@postech.ac.kr)
 
 [LinkedIn](http://www.linkedin.com/in/jhm9507)
 
