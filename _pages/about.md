@@ -7,6 +7,10 @@ author_profile: true
 
 ### 전현민 (Hyunmin Jeon)
 
+<figure style="width:150px">
+    <img src="{{ site.url }}{{ site.baseurl }}/assets/images/portfolio/profile.jpg" alt="">
+</figure>
+
 July 11, 1995
 
 대한민국, 경상북도 포항시
