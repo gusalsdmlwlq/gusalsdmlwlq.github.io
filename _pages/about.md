@@ -91,7 +91,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
   Microsoft가 주최한 *Multi-domain Task-oriented Dialog Challenge II* 트랙에 참여
 
-  Multi-domain task-oriented dialogue system 개발 및 포스터 세션 발표 [[포스터](https://drive.google.com/file/d/1UTFyFMTvW7P1UR79mX25FgserYaPc4Gd/view)]
+  Multi-domain task-oriented dialogue system 개발 및 포스터 세션 발표 [[포스터](https://drive.google.com/file/d/18uRvgZtYzHQ-QA7jNrKhD4hBYn3brbcn/view?usp=sharing)]
 
 * **법률 챗봇**
 
