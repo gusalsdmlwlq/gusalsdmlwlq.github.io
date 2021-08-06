@@ -61,7 +61,9 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 * **DORA: Towards Policy Optimization for Task-oriented Dialogue System with Efficient Context**
 
-  Submitted to Computer Speech & Language (Under review)
+  Submitted to Computer Speech & Language (minor revision)
+
+  preprint version [[arXiv](https://arxiv.org/abs/2107.03286)]
 
 * **Domain State Tracking for a Simplified Dialogue System**
 
