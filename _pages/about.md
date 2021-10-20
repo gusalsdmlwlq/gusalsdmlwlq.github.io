@@ -43,6 +43,12 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 ## Experience
 
+* **게임빌컴투스플랫폼** / AI developer (2021.09 ~ )
+
+  AI 개발
+
+  고객센터 챗봇 개발
+
 * **POSTECH** / Researcher (2020.08 ~ 2020.12)
 
   국가 R&D 과제로 법률 챗봇 개발
@@ -51,7 +57,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
   컴퓨터 SW시스템 개론 (CSED211) 실습 조교
 
-* **WiseNut** / Intern (2019.01 ~ 2019.02)
+* **와이즈넛** / Intern (2019.01 ~ 2019.02)
 
   산학 협력 캡스톤 디자인으로 머신러닝을 활용한 웹 크롤러 개발
 
@@ -61,9 +67,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 * **DORA: Towards Policy Optimization for Task-oriented Dialogue System with Efficient Context**
 
-  Submitted to Computer Speech & Language (minor revision)
-
-  preprint version [[arXiv](https://arxiv.org/abs/2107.03286)]
+  Computer Speech & Language [[Elsevier](https://www.sciencedirect.com/science/article/pii/S0885230821001078)]
 
 * **Domain State Tracking for a Simplified Dialogue System**
 
