@@ -13,7 +13,7 @@ author_profile: true
 
 July 11, 1995
 
-대한민국, 경상북도 포항시
+대한민국, 서울특별시
 
 ## Skill
 
@@ -37,11 +37,11 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 * **컴투스플랫폼** / AI developer (2021.09 ~ )
   
-  AI 개발
+  AI 연구 & 개발
   
   게임 FAQ 챗봇 개발
   
-  HR 챗봇 개발
+  사내 HR 챗봇 개발
 
 * **POSTECH** / Researcher (2020.08 ~ 2020.12)
   
@@ -231,7 +231,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 ## Contact
 
-[gusalsrhkals@naver.com](mailto:gusalsrhkals@naver.com) / [jhm9507@postech.ac.kr](mailto:jhm9507@postech.ac.kr)
+[gusalsrhkals@naver.com](mailto:gusalsrhkals@naver.com) / [jhm9507@com2us.com](mailto:jhm9507@com2us.com)
 
 [LinkedIn](http://www.linkedin.com/in/jhm9507)
 
