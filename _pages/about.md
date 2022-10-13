@@ -59,7 +59,7 @@ B.S. in Computer Science & Engineering at Hanyang University ERICA (2014.03 ~ 20
 
 * **Schema Encoding for Transferable Dialogue State Tracking**
   
-  COLING 2022 (accept)
+  COLING 2022 [[ACL Anthology](https://aclanthology.org/2022.coling-1.28/)]
 
 * **DORA: Towards Policy Optimization for Task-oriented Dialogue System with Efficient Context**
   
