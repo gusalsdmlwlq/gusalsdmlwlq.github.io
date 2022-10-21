@@ -18,7 +18,7 @@ July 11, 1995
 <br />
 <br />
 
-# Skill
+# **Skill**
 
 * Python
 * Pytorch
@@ -29,7 +29,7 @@ July 11, 1995
 <br />
 <br />
 
-# Education
+# **Education**
 
 ## POSTECH / M.S.
 
@@ -49,7 +49,7 @@ July 11, 1995
 <br />
 <br />
 
-# Experience
+# **Experience**
 
 ## **컴투스플랫폼** / AI developer
 
@@ -88,7 +88,7 @@ July 11, 1995
 <br />
 <br />
 
-# Research
+# **Research**
 
 ## Paper
 
@@ -125,7 +125,7 @@ July 11, 1995
 <br />
 <br />
 
-# Project
+# **Project**
 
 ## 9th Dialog System Technology Challenge (DSTC-9)
 
@@ -240,7 +240,7 @@ July 11, 1995
 <br />
 <br />
 
-# Record
+# **Record**
 
 ### 9th Dialog System Technology Challenge (DSTC-9) / 2020.10.23
   
@@ -262,7 +262,7 @@ July 11, 1995
 <br />
 <br />
 
-# Certification
+# **Certification**
 
 ### Global-PBL program in Shibaura Institute of Technology, Japan / 2019.07.29
 
@@ -275,6 +275,9 @@ July 11, 1995
 ### 정보처리기사 / 2019.05.23
   
 * [[Google Drive](https://drive.google.com/file/d/1IJ0MQsHdYUxLGWs0DJAuZazj03SUk2Jt/view?usp=sharing)]
+
+<br />
+<br />
 
 ## Contact
 
