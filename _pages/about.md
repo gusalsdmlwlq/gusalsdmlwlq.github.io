@@ -154,6 +154,7 @@ July 11, 1995
   * Yahoo financial API 활용
   * 연관 키워드 추출
   * 주가 패턴이 유사한 주식 추출
+* 서비스 페이지 [[URL](https://redtree-uzjcui2cca-uc.a.run.app)]
 
 ## Toy NLP projects
 
