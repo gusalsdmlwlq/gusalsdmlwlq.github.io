@@ -15,6 +15,9 @@ July 11, 1995
 
 대한민국, 서울특별시
 
+<br />
+<br />
+
 # Skill
 
 * Python
@@ -22,6 +25,9 @@ July 11, 1995
 * Deep Learning
 * NLP
 * Task-oriented Dialogue System
+
+<br />
+<br />
 
 # Education
 
@@ -39,6 +45,9 @@ July 11, 1995
 
   * Computer Science & Engineering
   * Overall Grade 4.27 / 4.5
+
+<br />
+<br />
 
 # Experience
 
@@ -76,6 +85,9 @@ July 11, 1995
   
 * 산학 협력 캡스톤 디자인으로 머신러닝을 활용한 웹 크롤러 개발
 
+<br />
+<br />
+
 # Research
 
 ## Paper
@@ -109,6 +121,9 @@ July 11, 1995
 ### 대화 로봇을 활용한 법률문서 자동작성 서버 및 그것의 동작방법
 
 * 출원번호: 10-2021-0009714
+
+<br />
+<br />
 
 # Project
 
@@ -222,6 +237,9 @@ July 11, 1995
 * Raspberry Pi에 Raspbian OS를 설치하여 웹 서버로 사용
 * APM & JS를 사용해 간단한 웹 게시판 기능 구현 [[Github](https://github.com/gusalsdmlwlq/JeonHyunMin/tree/master/pi)]
 
+<br />
+<br />
+
 # Record
 
 ### 9th Dialog System Technology Challenge (DSTC-9) / 2020.10.23
@@ -240,6 +258,9 @@ July 11, 1995
 * (주) 맨텍 주최 [[대회 사이트](http://www.oidc.co.kr/oidc2019)]
 * 대상
 * 소스 코드 [[Github](https://github.com/open-tube/open-tube)]
+
+<br />
+<br />
 
 # Certification
 
