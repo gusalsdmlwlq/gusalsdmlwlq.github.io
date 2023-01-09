@@ -181,7 +181,7 @@ July 11, 1995
 ### KoGPT-2 summarization 모델
   
 * SKT AI의 KoGPT-2와 신문 기사 요약 데이터를 사용하여 summarization 모델 구현 [[신문 기사 요약 데이터](https://corpus.korean.go.kr/main.do#down)]
-* Pytorch 구현 [[Github]()]
+* Pytorch 구현 [[Github](https://github.com/gusalsdmlwlq/KoGPT2-Summarization)]
 
 ### Machine translation 모델
   
