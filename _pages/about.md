@@ -60,22 +60,6 @@ July 11, 1995
 * AI 연구 & 개발
 * 사내 HR 챗봇 개발
 * 게임 FAQ 챗봇 개발
-  
-## **POSTECH** / Researcher
-
-### 2020.08 ~ 2020.12
-
-### Python, Pytorch, NLP
-
-* 국가 R&D 과제로 법률 챗봇 개발
-
-## **POSTECH** / Teaching Assistant
-
-### 2019.09 ~ 2019.12
-
-### Linux
-  
-* 컴퓨터 SW시스템 개론 (CSED211) 실습 조교
 
 ## **와이즈넛** / Intern
 
