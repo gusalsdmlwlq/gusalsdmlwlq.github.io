@@ -156,6 +156,20 @@ July 11, 1995
   * 주가 패턴이 유사한 주식 추출
 * 서비스 페이지 [[URL](https://redtree-uzjcui2cca-uc.a.run.app)]
 
+## 논문 작성 GPT
+
+### Python, Flask, Javascript, jQuery, GCP, ChatGPT
+
+* GCP를 활용하여 간단한 웹 서비스 구현
+  * Cloud Run
+* ChatGPT를 활용하여 영문 논문 작성에 도움이 되는 기능 구현
+  * 단어 번역
+  * 문장 번역
+  * 작문
+  * 문장 변환
+  * 문법 교정
+* 서비스 페이지 [[URL](https://flask-gpt-zc24ad2aha-uc.a.run.app)]
+
 ## Toy NLP projects
 
 ### DS-DST belief tracker 논문 구현
