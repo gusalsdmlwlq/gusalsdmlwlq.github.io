@@ -156,7 +156,7 @@ July 11, 1995
   * 주가 패턴이 유사한 주식 추출
 * 서비스 페이지 [[URL](https://redtree-uzjcui2cca-uc.a.run.app)]
 
-## 논문 작성 GPT
+## 논문 작성 보조 시스템
 
 ### Python, Flask, Javascript, jQuery, GCP, ChatGPT
 
