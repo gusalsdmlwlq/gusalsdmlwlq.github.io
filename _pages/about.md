@@ -170,6 +170,17 @@ July 11, 1995
   * 문법 교정
 * 서비스 페이지 [[URL](https://flask-gpt-zc24ad2aha-uc.a.run.app)]
 
+## 뉴스 GPT
+
+### Python, Flask, Javascript, jQuery, GCP, ChatGPT
+
+* GCP를 활용하여 간단한 웹 서비스 구현
+  * Cloud Run
+* ChatGPT를 활용하여 경제 뉴스 챗봇 구현
+  * 경제 뉴스 수집
+  * 뉴스 문서를 검색하여 문서 기반으로 답변 생성
+* 서비스 페이지 [[URL](https://newssie-yozbwcvdaa-uc.a.run.app)]
+
 ## Toy NLP projects
 
 ### DS-DST belief tracker 논문 구현
