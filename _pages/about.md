@@ -170,7 +170,7 @@ July 11, 1995
   * 문법 교정
 * 서비스 페이지 [[URL](https://flask-gpt-zc24ad2aha-uc.a.run.app)]
 
-## 뉴스 GPT
+## 뉴스 챗봇
 
 ### Python, Flask, Javascript, jQuery, GCP, ChatGPT
 
