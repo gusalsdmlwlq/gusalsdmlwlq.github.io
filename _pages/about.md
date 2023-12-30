@@ -51,9 +51,17 @@ July 11, 1995
 
 # ***Experience***
 
+## **넷마블** / NLP Engineer
+
+### 2023.12 ~ Current
+
+### Python, Pytorch, NLP
+
+* NLP 연구 & 개발
+
 ## **컴투스플랫폼** / AI developer
 
-### 2021.09 ~ Current
+### 2021.09 ~ 2023.11
 
 ### Python, Pytorch, NLP
 
