@@ -187,19 +187,29 @@ hr{ border:0; border-top:1px solid var(--line); margin: 28px 0; }
   }
 }
 
-body {
-  display: flex;
-  justify-content: center;
-}
-
-.page-content {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
+/* ===== Proper Centering for Minima ===== */
+html, body { width: 100%; }
 
 .wrapper {
-  width: 100%;
   max-width: 980px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* header/footer도 같은 폭으로 */
+.site-header .wrapper,
+.site-footer .wrapper {
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* 기본 테마가 page-content에 padding을 줄 때가 있어서 정리 */
+.page-content {
+  padding-left: 0;
+  padding-right: 0;
 }
