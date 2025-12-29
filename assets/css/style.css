@@ -198,9 +198,8 @@ html, body { width: 100%; }
   padding-right: 16px;
 }
 
-/* header/footer도 같은 폭으로 */
-.site-header .wrapper,
-.site-footer .wrapper {
+/* header도 같은 폭으로 */
+.site-header .wrapper {
   max-width: 980px;
   margin-left: auto;
   margin-right: auto;
@@ -212,4 +211,9 @@ html, body { width: 100%; }
 .page-content {
   padding-left: 0;
   padding-right: 0;
+}
+
+/* ===== Remove Footer ===== */
+.site-footer {
+  display: none !important;
 }
