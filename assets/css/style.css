@@ -13,7 +13,6 @@ html,body{ background:var(--bg); color:var(--text); }
 a{ color:var(--accent); text-decoration: none; }
 a:hover{ text-decoration: underline; }
 
-.wrapper, .page-content, .container { max-width: 980px; }
 .site-header, .site-footer{ border:0; background: transparent; }
 
 .page-content{
