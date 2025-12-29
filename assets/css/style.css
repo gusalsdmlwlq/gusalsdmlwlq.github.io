@@ -186,3 +186,20 @@ hr{ border:0; border-top:1px solid var(--line); margin: 28px 0; }
     height: 96px;
   }
 }
+
+body {
+  display: flex;
+  justify-content: center;
+}
+
+.page-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}

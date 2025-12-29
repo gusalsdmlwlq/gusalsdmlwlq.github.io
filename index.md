@@ -220,7 +220,7 @@ title: Portfolio - Hyunmin Jeon
       <li>Multi-Agent 기반 주식 투자 비서 서비스 개발
           <ul>
               <li>동적 Planning을 통한 Multi-Agent Orchestration</li>
-              <li>데이터 수집, 분석, 시각화 등
+              <li>데이터 수집, 분석, 시각화 등</li>
           </ul>
       </li>
       <li>경제 데이터 분석 인사이트 및 경제 지식 제공
