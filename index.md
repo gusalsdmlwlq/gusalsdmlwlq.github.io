@@ -291,6 +291,7 @@ title: Portfolio - Hyunmin Jeon
     <ul class="list-tight">
       <li>Find or Classify? Dual Strategy for Slot-Value Predictions on Multi-Domain Dialog State Tracking (Zhang et al., 2019) · <a href="https://www.aclweb.org/anthology/2020.starsem-1.17/" target="_blank">논문</a></li>
       <li>Pytorch 구현 · <a href="https://github.com/gusalsdmlwlq/DS-DST" target="_blank">Github</a></li>
+    </ul>
   </div>
 
   <div class="item">
@@ -300,6 +301,7 @@ title: Portfolio - Hyunmin Jeon
     <ul class="list-tight">
       <li>SKT AI의 KoGPT-2와 신문 기사 요약 데이터를 사용하여 summarization 모델 구현 · <a href="https://corpus.korean.go.kr/main.do#down" target="_blank">신문 기사 요약 데이터</a></li>
       <li>Pytorch 구현 · <a href="https://github.com/gusalsdmlwlq/KoGPT2-Summarization" target="_blank">Github</a></li>
+    </ul>
   </div>
   
   <div class="item">
@@ -310,6 +312,7 @@ title: Portfolio - Hyunmin Jeon
       <li>Transformer와 ISWLT 2016 EN-DE 데이터를 사용하여 영어 → 독일어 translation 모델 구현 · <a href="https://wit3.fbk.eu/2016-01" target="_blank">ISWLT 2016 데이터</a></li>
       <li>Attention is all you need (Vaswani et al., 2017) 논문 transformer 구현 · <a href="https://papers.nips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html" target="_blank">논문</a></li>
       <li>Pytorch 구현 · <a href="https://github.com/gusalsdmlwlq/Machine-Translation" target="_blank">Github</a></li>
+    </ul>
   </div>
   
   <div class="item">
@@ -320,7 +323,6 @@ title: Portfolio - Hyunmin Jeon
       <li>Bidirectional LSTM과 Naver sentiment movie corpus (NSMC) 데이터를 사용하여 sentiment analysis 모델 구현 · <a href="https://github.com/e9t/nsmc" target="_blank">NSMC 데이터</a>
         <ul>
           <li>Tensorflow 구현 · <a href="https://github.com/gusalsdmlwlq/Sentiment-Classification" target="_blank">Github</a></li>
-          <li>영어 임베딩: GloVe</li>
         </ul>
       </li>
       <li>2019 오픈인프라 개발 경진대회에서 Youtube 댓글 분석 모델 구현
@@ -330,6 +332,7 @@ title: Portfolio - Hyunmin Jeon
           <li>Tensorflow 구현 · <a href="https://github.com/open-tube/open-tube" target="_blank">Github</a></li>
         </ul>
       </li>
+    </ul>
   </div>
 
   <div class="item">
@@ -341,6 +344,7 @@ title: Portfolio - Hyunmin Jeon
       <li>Scikit-learn의 SVM을 사용</li>
       <li>Puppeteer 라이브러리 사용</li>
       <li>Python & Node.js 구현 · <a href="https://github.com/gusalsdmlwlq/Crawler" target="_blank">Github</a></li>
+    </ul>
   </div>
 
   <div class="item">
@@ -352,6 +356,7 @@ title: Portfolio - Hyunmin Jeon
       <li>YOLO 알고리즘 사용</li>
       <li>Raspberry Pi와 Android 연동</li>
       <li>Python & Android 구현 · <a href="https://github.com/gusalsdmlwlq/RaspberryPi" target="_blank">Github</a></li>
+    </ul>
   </div>
 </div>
 
