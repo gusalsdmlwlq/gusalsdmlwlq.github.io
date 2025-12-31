@@ -375,3 +375,25 @@ title: Portfolio - Hyunmin Jeon
     </div>
   </main>
 </div>
+
+<script>
+  const sections = document.querySelectorAll("h2[id]");
+  const tocLinks = document.querySelectorAll(".toc-link");
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(link => link.classList.remove("active"));
+          const active = document.querySelector(
+            `.toc-link[href="#${entry.target.id}"]`
+          );
+          if (active) active.classList.add("active");
+        }
+      });
+    },
+    { rootMargin: "-40% 0px -55% 0px" }
+  );
+
+  sections.forEach(section => observer.observe(section));
+</script>
