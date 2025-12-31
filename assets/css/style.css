@@ -190,7 +190,7 @@ hr{ border:0; border-top:1px solid var(--line); margin: 28px 0; }
 html, body { width: 100%; }
 
 .wrapper {
-  max-width: 1096px;
+  max-width: 1300px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
@@ -199,7 +199,7 @@ html, body { width: 100%; }
 
 /* header도 같은 폭으로 */
 .site-header .wrapper {
-  max-width: 1096px;
+  max-width: 1300px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
@@ -225,41 +225,57 @@ html, body { width: 100%; }
   align-items: start;
 }
 
-.toc{
-  position: sticky;
-  top: 18px;
-  align-self: start;
-}
-
-.toc-box{
-  padding: 16px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.03);
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
-}
-
-.toc-title{
-  font-weight: 800;
-  margin-bottom: 10px;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-
+/* ===== TOC (Clean) ===== */
 .toc-link{
   display: block;
-  padding: 8px 10px;
-  border-radius: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  border: 1px solid transparent;
+  padding: 9px 12px;
   margin: 6px 0;
+  border-radius: 12px;
+
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: none;
+
+  border: 1px solid transparent;
+  background: transparent;
+  
+  transition: 
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease;
 }
 
+/* hover */
 .toc-link:hover{
   color: var(--text);
-  background: rgba(255,255,255,.04);
-  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.08);
+}
+
+/* visited 링크 색 제거 */
+.toc-link:visited{
+  color: var(--muted);
+}
+
+/* 클릭/포커스 시 파란색 제거 */
+.toc-link:active,
+.toc-link:focus{
+  outline: none;
+  color: var(--text);
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.12);
+}
+
+/* 현재 위치(수동으로 active 클래스 줄 때) */
+.toc-link.active{
+  color: var(--text);
+  font-weight: 700;
+  background: linear-gradient(
+    90deg,
+    rgba(122,162,255,.18),
+    rgba(122,162,255,.05)
+  );
+  border-color: rgba(122,162,255,.35);
 }
 
 /* 모바일에서는 목차 숨기고 상단으로 */
