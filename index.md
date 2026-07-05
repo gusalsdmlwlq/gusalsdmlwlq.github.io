@@ -153,9 +153,9 @@ title: Portfolio - Hyunmin Jeon
           <em>AI Agent</em><em>RAG</em><em>Knowledge Graph</em><em>Graph RAG</em><em>NLP</em><em>Python</em><em>GCP</em>
         </div>
         <ul class="list-tight">
+          <li>사내 Agentic RAG 시스템 개발</li>
           <li>Knowledge Graph 기반 RAG Agent 개발</li>
           <li>데이터 분석 및 보고서 작성 Agent 개발</li>
-          <li>사내 RAG 챗봇 시스템 개발</li>
           <li>게임 가이드 챗봇 개발</li>
           <li>LLM & Agent 방법론 리서치</li>
         </ul>
@@ -240,6 +240,28 @@ title: Portfolio - Hyunmin Jeon
               <li>GCP VM으로 Nginx & FastAPI 서버 배포</li>
               <li>웹 소켓 통신으로 답변 스트리밍</li>
             </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="top">
+          <div class="role">포트폴리오 Agent</div>
+        </div>
+        <div class="pills">
+          <em>Generative Agent</em><em>Agentic RAG</em><em>Graph RAG</em><em>Knowledge Graph</em><em>Python</em><em>Neo4j</em><em>GCP</em><em>Github Page</em>
+        </div>
+        <ul class="list-tight">
+          <li>이력/경력 사항 및 업무/프로젝트 경험을 관리하기 위한 Graph RAG Agent 서비스 개발
+              <ul>
+                  <li>텍스트 형태로 데이터를 입력하면 자동으로 Knowledge Graph로 빌드</li>
+                  <li>Knowledge Graph 기반으로 이력/경력 및 업무/프로젝트 관련 질의응답</li>
+              </ul>
+          </li>
+          <li>Github Page 기반의 웹 포트폴리오 페이지에 Graph RAG 기반 질의응답 기능을 챗봇 형태로 연동
+              <ul>
+                  <li>GCP VM으로 Nginx & FastAPI 서버 배포</li>
+                  <li>Github Page에서 이벤트 스트리밍 기반 통신</li>
+              </ul>
           </li>
         </ul>
       </div>
