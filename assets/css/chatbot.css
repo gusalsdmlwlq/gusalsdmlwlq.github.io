@@ -108,6 +108,18 @@
 }
 #pm-chat-close:hover { color: var(--pm-text); }
 
+/* ── Beta notice ── */
+#pm-chat-notice {
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  color: #b8924a;
+  background: rgba(184, 146, 74, 0.08);
+  border-bottom: 1px solid rgba(184, 146, 74, 0.2);
+  flex-shrink: 0;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
 /* ── Messages ── */
 #pm-chat-messages {
   flex: 1;

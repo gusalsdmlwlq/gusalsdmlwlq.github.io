@@ -48,6 +48,7 @@
         </div>
         <button id="pm-chat-close" aria-label="챗봇 닫기">✕</button>
       </div>
+      <div id="pm-chat-notice">⚠ 베타 서비스입니다 — 서버가 불안정하거나 답변이 부정확할 수 있습니다.</div>
       <div id="pm-chat-messages"></div>
       <div id="pm-chat-input-row">
         <input id="pm-chat-input" type="text" placeholder="메시지를 입력하세요..." maxlength="500" aria-label="챗봇에게 질문 입력" />
