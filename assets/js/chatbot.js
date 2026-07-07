@@ -13,19 +13,9 @@
     });
   }
 
-  /* ── session_id ── */
-  function getSessionId() {
-    try {
-      let id = localStorage.getItem('pm_session_id');
-      if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem('pm_session_id', id);
-      }
-      return id;
-    } catch {
-      return crypto.randomUUID();
-    }
-  }
+  /* ── session_id: 페이지 로드마다 새 세션, 단일 방문 내 멀티턴 유지 ── */
+  const SESSION_ID = crypto.randomUUID();
+  function getSessionId() { return SESSION_ID; }
 
   /* ── DOM ── */
   function buildDOM() {
