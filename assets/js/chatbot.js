@@ -36,6 +36,10 @@
           <div id="pm-chat-title">Portfolio Assistant</div>
           <div id="pm-chat-subtitle">무엇이든 물어보세요</div>
         </div>
+        <div id="pm-admin-wrap">
+          <input type="password" id="pm-admin-key" placeholder="Admin 키" autocomplete="off" spellcheck="false" aria-label="Admin 시크릿 키 입력" />
+          <span id="pm-admin-badge" class="pm-hidden">Admin</span>
+        </div>
         <button id="pm-chat-close" aria-label="챗봇 닫기">✕</button>
       </div>
       <div id="pm-chat-notice">⚠ 베타 서비스입니다 — 서버가 불안정하거나 답변이 부정확할 수 있습니다.</div>
@@ -137,7 +141,7 @@
     try {
       const res = await fetch(`${API_BASE}/ask/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ session_id: sessionId, question, top_k: 5 }),
         signal,
       });
@@ -201,6 +205,15 @@
     }
   }
 
+  /* ── Admin key helpers ── */
+  function getAuthHeaders() {
+    const adminKeyEl = document.getElementById('pm-admin-key');
+    const secret = adminKeyEl ? adminKeyEl.value.trim() : '';
+    const h = { 'Content-Type': 'application/json' };
+    if (secret) h['Authorization'] = `Bearer ${secret}`;
+    return h;
+  }
+
   /* ── Init ── */
   function init() {
     loadMarked();
@@ -210,6 +223,15 @@
     const input = popup.querySelector('#pm-chat-input');
     const send = popup.querySelector('#pm-chat-send');
     const close = popup.querySelector('#pm-chat-close');
+
+    // Admin key badge toggle
+    const adminKeyEl = popup.querySelector('#pm-admin-key');
+    const adminBadgeEl = popup.querySelector('#pm-admin-badge');
+    adminKeyEl.addEventListener('input', () => {
+      const has = adminKeyEl.value.length > 0;
+      adminKeyEl.classList.toggle('pm-admin-key-active', has);
+      adminBadgeEl.classList.toggle('pm-hidden', !has);
+    });
     let welcomed = false;
     let abortCtrl = null;
 
