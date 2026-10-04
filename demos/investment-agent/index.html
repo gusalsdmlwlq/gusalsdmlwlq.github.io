@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>투자 비서 Agent · 리서치 채팅 프로토타입</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js" defer></script>
+<style>
+  :root{ --bg:#0b0f19; --card:#121a2b; --text:#e8edf7; --muted:#a9b4c7; --line:#24314e; --accent:#7aa2ff; --accent2:#8bffd0; --warn:#ffd89a; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif; font-size:15px; line-height:1.6; display:flex; flex-direction:column; overflow-x:hidden; }
+  button{ font:inherit; cursor:pointer; }
+  header{ padding:12px 16px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+  header h1{ font-size:1rem; margin:0; }
+  .notice{ color:var(--muted); font-size:.8rem; }
+  #reset{ padding:6px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:transparent; color:var(--muted); font-size:.85rem; }
+  #reset:hover{ color:var(--text); }
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px; border-bottom:1px solid var(--line); }
+  .preset{ padding:7px 12px; border-radius:999px; border:1px solid rgba(122,162,255,.4); background:rgba(122,162,255,.12); color:var(--text); font-size:.88rem; text-align:left; max-width:100%; }
+  .preset:disabled{ opacity:.45; cursor:not-allowed; }
+  #chat{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .empty{ color:var(--muted); text-align:center; margin:auto; font-size:.9rem; }
+  .msg-user{ align-self:flex-end; max-width:80%; background:rgba(122,162,255,.22); padding:9px 13px; border-radius:14px 14px 4px 14px; overflow-wrap:anywhere; }
+  .sys{ align-self:flex-start; color:var(--accent2); font-size:.85rem; display:flex; align-items:center; gap:8px; }
+  .sys::before{ content:""; flex:none; width:7px; height:7px; border-radius:50%; background:var(--accent2); }
+  .card{ border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); border-radius:12px; padding:10px 12px; font-size:.88rem; overflow-wrap:anywhere; }
+  .card summary{ cursor:pointer; font-weight:600; }
+  .card .label{ color:var(--accent); font-weight:600; margin-top:8px; font-size:.82rem; }
+  .card ul{ margin:4px 0 0; padding-left:18px; color:var(--muted); }
+  .ledger .head{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:4px; }
+  .ledger .step{ color:var(--muted); font-size:.78rem; }
+  .ledger .agent{ font-weight:700; color:var(--accent); }
+  .badge{ font-size:.72rem; padding:1px 8px; border-radius:999px; border:1px solid rgba(139,255,208,.35); color:var(--accent2); white-space:nowrap; }
+  .badge.warn{ border-color:rgba(255,216,154,.45); color:var(--warn); }
+  .ledger.blocked{ border-color:rgba(255,216,154,.4); }
+  .ledger .result{ color:var(--muted); margin-top:4px; font-size:.84rem; }
+  .ledger .result::before{ content:"↳ "; }
+  .urls{ display:flex; flex-wrap:wrap; gap:6px; }
+  .url{ font-size:.78rem; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:var(--muted); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .chart{ border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px; background:#0d1424; }
+  .chart .cap{ font-size:.8rem; color:var(--muted); margin-bottom:4px; }
+  .chart svg{ width:100%; max-width:640px; height:auto; display:block; margin:0 auto; }
+  .answer{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px 14px; overflow-wrap:anywhere; }
+  .answer h3{ font-size:1rem; margin:.5em 0 .3em; }
+  .answer p{ margin:.4em 0; }
+  .answer ul{ margin:.3em 0; padding-left:20px; }
+  .answer blockquote{ margin:.6em 0 0; padding-left:10px; border-left:3px solid var(--line); color:var(--muted); font-size:.85rem; }
+  .answer.streaming::after{ content:"▍"; color:var(--accent); }
+</style>
+</head>
+<body data-state="idle">
+<header>
+  <div>
+    <h1>투자 비서 Agent · 리서치 채팅</h1>
+    <div class="notice">더미 데이터로 재현한 프로토타입입니다 · 실제 API를 호출하지 않습니다</div>
+  </div>
+  <button id="reset" type="button">처음부터</button>
+</header>
+<div class="presets" id="presets"></div>
+<main id="chat"></main>
+<script>
+(() => {
+  const SPEED = Math.max(1, Number(new URLSearchParams(location.search).get('speed')) || 1);
+  const STREAM_CHUNK = 4;
+  const STREAM_TICK = 30;
+  const EMPTY_TEXT = '위의 질문 중 하나를 눌러 보세요.';
+
+  const WEEKS = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13'];
+
+  const SCENARIOS = [
+    {
+      id: 'semis',
+      label: '엔비디아 실적 발표 앞두고 반도체 섹터 분위기 어때?',
+      events: [
+        { type: 'user', delay: 100 },
+        { type: 'system', text: '질문을 분석하는 중입니다...', delay: 400 },
+        { type: 'system', text: '계획을 세우는 중입니다...', delay: 1000 },
+        { type: 'plan', delay: 1000,
+          facts: ['주어진 사실: 엔비디아 실적 발표가 다가오고 있음', '찾아볼 사실: 발표 일정과 시장 기대치, 반도체 지수의 최근 흐름, 관련 뉴스', '추론할 사실: 실적 기대가 섹터 투자심리에 미치는 영향'],
+          plan: ['WebSearcher: 실적 발표 일정·기대치 관련 최신 뉴스 검색', 'DataCollector: NVDA·SOXX 최근 3개월 주가와 관련 뉴스 수집', 'Visualizer: 상대 수익률 차트 생성', 'Analyst: 수집 데이터 기반 섹터 분위기 분석'] },
+        { type: 'ledger', step: 1, agent: 'WebSearcher', instruction: '엔비디아 실적 발표 일정과 시장 기대치 관련 최신 뉴스를 검색해 주세요.', badges: ['진행 중', '반복 아님'], delay: 1000 },
+        { type: 'result', text: '뉴스 6건 수집 · 발표일, EPS 기대치, 데이터센터 매출 전망', delay: 1200 },
+        { type: 'ledger', step: 2, agent: 'DataCollector', instruction: 'NVDA와 SOXX의 최근 3개월 일별 주가와 반도체 관련 뉴스를 수집해 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '주가 2종(63거래일) · 뉴스 8건 (ES 하이브리드 검색)', delay: 1200 },
+        { type: 'ledger', step: 3, agent: 'Visualizer', instruction: 'NVDA와 SOXX의 3개월 누적 수익률을 비교하는 차트를 만들어 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '차트 1개 생성 (pandas + matplotlib 코드 실행)', delay: 1200 },
+        { type: 'ledger', step: 4, agent: 'Analyst', instruction: '수집한 뉴스와 주가 흐름으로 실적 발표 전 섹터 분위기를 분석해 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '기대감 선반영 여부, 변동성, 리스크 요인 정리', delay: 1200 },
+        { type: 'ledger', step: 5, agent: 'Manager', instruction: '목표 달성 · 답변 가능 → 최종 답변 단계로 이동', badges: ['goal ✓', 'answerable ✓'], delay: 800 },
+        { type: 'system', text: '최종 답변을 생성하는 중입니다...', delay: 700 },
+        { type: 'urls', items: ['예시 뉴스 A · 엔비디아 실적 프리뷰', '예시 뉴스 B · 반도체주, 실적 앞두고 혼조', '예시 뉴스 C · AI 서버 수요 전망', '예시 뉴스 D · 반도체 지수 주간 동향'], delay: 600 },
+        { type: 'chart', title: 'NVDA vs SOXX 3개월 누적 수익률 (예시 데이터)', unit: '%', labels: WEEKS,
+          series: [
+            { name: 'NVDA', color: '#7aa2ff', values: [0, 2.1, 4.5, 3.8, 6.2, 8.9, 7.4, 10.3, 12.8, 11.6, 14.2, 16.9, 18.4] },
+            { name: 'SOXX', color: '#8bffd0', values: [0, 1.2, 2.8, 2.1, 3.9, 5.1, 4.4, 6.2, 7.5, 6.8, 8.3, 9.6, 10.2] },
+          ], delay: 600 },
+        { type: 'answer', delay: 500, text: [
+          '### 요약',
+          '실적 발표를 앞두고 반도체 섹터는 **기대감이 상당 부분 선반영**된 모습입니다.',
+          '',
+          '### 근거',
+          '- 최근 3개월 NVDA 누적 수익률은 **약 +18%** 수준으로, 반도체 지수(SOXX, 약 +10%)를 웃돌았습니다.',
+          '- 뉴스에서는 데이터센터 매출 성장 기대가 반복적으로 언급됩니다.',
+          '- 발표 직전 구간에서 변동성이 커지는 패턴이 보입니다.',
+          '',
+          '### 체크 포인트',
+          '- 가이던스가 기대에 못 미치면 선반영분이 되돌려질 수 있습니다.',
+          '- 공급망·수출 규제 관련 뉴스도 함께 확인하세요.',
+          '',
+          '> 데모용 예시 답변이며, 수치와 뉴스는 실제와 무관합니다.',
+        ].join('\n') },
+      ],
+    },
+    {
+      id: 'rates',
+      label: '최근 미국 금리 동향이 기술주에 미친 영향 정리해줘',
+      events: [
+        { type: 'user', delay: 100 },
+        { type: 'system', text: '질문을 분석하는 중입니다...', delay: 400 },
+        { type: 'system', text: '계획을 세우는 중입니다...', delay: 1000 },
+        { type: 'plan', delay: 1000,
+          facts: ['주어진 사실: 기간은 「최근」, 대상은 미국 금리와 기술주', '찾아볼 사실: 최근 FOMC 결정, 국채 금리 추이, 나스닥 기술주 흐름', '추론할 사실: 금리 변화와 기술주 밸류에이션의 관계'],
+          plan: ['Analyst: 금리와 기술주 관계 분석', 'WebSearcher: FOMC·국채 금리 뉴스 검색', 'DataCollector: QQQ 3개월 주가 수집', 'Visualizer: 금리와 QQQ 비교 차트'] },
+        { type: 'ledger', step: 1, agent: 'Analyst', instruction: '금리와 기술주의 관계를 분석해 주세요.', badges: ['의존성 미충족'], blocked: true, delay: 1000 },
+        { type: 'result', text: 'Analyst는 DataCollector 또는 WebSearcher가 먼저 실행되어야 합니다 → Manager가 다음 담당자를 다시 결정', delay: 1000 },
+        { type: 'ledger', step: 2, agent: 'WebSearcher', instruction: '최근 FOMC 결정과 미국 10년물 국채 금리 관련 뉴스를 검색해 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '뉴스 5건 수집 · FOMC 결과, 10년물 금리 추이', delay: 1200 },
+        { type: 'ledger', step: 3, agent: 'DataCollector', instruction: 'QQQ의 최근 3개월 일별 주가와 기술주 관련 뉴스를 수집해 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '주가 1종(63거래일) · 뉴스 7건', delay: 1200 },
+        { type: 'ledger', step: 4, agent: 'Visualizer', instruction: '10년물 금리와 QQQ를 지수화(시작=100)해 비교하는 차트를 만들어 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '차트 1개 생성', delay: 1200 },
+        { type: 'ledger', step: 5, agent: 'Analyst', instruction: '수집 데이터로 금리 변화가 기술주에 준 영향을 분석해 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '금리 하락 구간의 반등, 민감도가 큰 종목군 정리', delay: 1200 },
+        { type: 'ledger', step: 6, agent: 'Manager', instruction: '목표 달성 · 답변 가능 → 최종 답변 단계로 이동', badges: ['goal ✓', 'answerable ✓'], delay: 800 },
+        { type: 'system', text: '최종 답변을 생성하는 중입니다...', delay: 700 },
+        { type: 'urls', items: ['예시 뉴스 E · FOMC 결정 요약', '예시 뉴스 F · 국채 금리 하락에 기술주 반등', '예시 뉴스 G · 성장주 밸류에이션 점검'], delay: 600 },
+        { type: 'chart', title: '미국 10년물 금리 vs QQQ, 지수화 시작=100 (예시 데이터)', unit: '', labels: WEEKS,
+          series: [
+            { name: '10Y 금리', color: '#ffd89a', values: [100, 101, 103, 102, 100, 98, 97, 95, 96, 94, 93, 92, 91] },
+            { name: 'QQQ', color: '#7aa2ff', values: [100, 99, 97, 98, 100, 102, 103, 105, 104, 106, 108, 109, 110] },
+          ], delay: 600 },
+        { type: 'answer', delay: 500, text: [
+          '### 요약',
+          '최근 구간에서는 **금리가 내려갈수록 기술주가 강해지는** 흐름이 뚜렷했습니다.',
+          '',
+          '### 근거',
+          '- 10년물 금리(지수화)가 약 9% 하락하는 동안 QQQ는 약 10% 상승했습니다.',
+          '- FOMC 이후 금리 인하 기대가 커지며 성장주 밸류에이션 부담이 줄었다는 해석이 많습니다.',
+          '',
+          '### 체크 포인트',
+          '- 금리 반등 시 민감도가 큰 고밸류 종목이 먼저 흔들릴 수 있습니다.',
+          '',
+          '> 데모용 예시 답변이며, 수치와 뉴스는 실제와 무관합니다.',
+        ].join('\n') },
+      ],
+    },
+    {
+      id: 'tsla',
+      label: '테슬라 최근 3개월 주가 흐름과 주요 뉴스 알려줘',
+      events: [
+        { type: 'user', delay: 100 },
+        { type: 'system', text: '질문을 분석하는 중입니다...', delay: 400 },
+        { type: 'system', text: '계획을 세우는 중입니다...', delay: 1000 },
+        { type: 'plan', delay: 1000,
+          facts: ['주어진 사실: 대상은 테슬라(TSLA), 기간은 3개월', '찾아볼 사실: 일별 주가, 종목 뉴스', '추론할 사실: 없음 (데이터 정리 위주)'],
+          plan: ['DataCollector: TSLA 3개월 주가와 종목 뉴스 수집', 'Visualizer: 주가 차트 생성'] },
+        { type: 'ledger', step: 1, agent: 'DataCollector', instruction: 'TSLA의 최근 3개월 일별 주가와 종목 뉴스를 수집해 주세요.', badges: ['진행 중', '반복 아님'], delay: 1000 },
+        { type: 'result', text: '주가 1종(63거래일) · 종목 뉴스 5건 (yfinance)', delay: 1200 },
+        { type: 'ledger', step: 2, agent: 'Visualizer', instruction: 'TSLA 3개월 종가 추이 차트를 만들어 주세요.', badges: ['진행 중', '반복 아님'], delay: 800 },
+        { type: 'result', text: '차트 1개 생성', delay: 1200 },
+        { type: 'ledger', step: 3, agent: 'Manager', instruction: '데이터로 답변 가능 · Analyst 생략 → 최종 답변 단계로 이동', badges: ['goal ✓', 'answerable ✓'], delay: 800 },
+        { type: 'system', text: '최종 답변을 생성하는 중입니다...', delay: 700 },
+        { type: 'urls', items: ['예시 뉴스 H · 분기 인도량 발표', '예시 뉴스 I · 신규 모델 출시 일정', '예시 뉴스 J · 에너지 사업 성장'], delay: 600 },
+        { type: 'chart', title: 'TSLA 3개월 종가 (예시 데이터, USD)', unit: '', labels: WEEKS,
+          series: [
+            { name: 'TSLA', color: '#7aa2ff', values: [242, 236, 251, 258, 247, 239, 262, 270, 265, 281, 276, 290, 287] },
+          ], delay: 600 },
+        { type: 'answer', delay: 500, text: [
+          '### 주가 흐름',
+          '3개월 동안 **약 242달러에서 287달러로 19%** 올랐고, 중간에 두 차례 조정이 있었습니다.',
+          '',
+          '### 주요 뉴스',
+          '- 분기 인도량 발표 직후 반등이 시작됐습니다.',
+          '- 신규 모델 출시 일정과 에너지 사업 성장이 함께 언급됩니다.',
+          '',
+          '> 데모용 예시 답변이며, 수치와 뉴스는 실제와 무관합니다.',
+        ].join('\n') },
+      ],
+    },
+  ];
+
+  const chat = document.getElementById('chat');
+  const presets = document.getElementById('presets');
+  const resetBtn = document.getElementById('reset');
+  let timers = [];
+  let runId = 0;
+  const streams = new Map();
+
+  function later(fn, ms, id) {
+    const t = setTimeout(() => { if (id === runId) fn(); }, ms / SPEED);
+    timers.push(t);
+  }
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function append(node) {
+    const empty = chat.querySelector('.empty');
+    if (empty) empty.remove();
+    chat.appendChild(node);
+    chat.scrollTop = chat.scrollHeight;
+    return node;
+  }
+
+  function list(items) {
+    const ul = el('ul');
+    items.forEach((t) => ul.appendChild(el('li', null, t)));
+    return ul;
+  }
+
+  function lineChart({ title, labels, series, unit }) {
+    const W = 560, H = 230, P = { l: 46, r: 14, t: 24, b: 28 };
+    const all = series.flatMap((s) => s.values);
+    const min = Math.min(...all), max = Math.max(...all), span = (max - min) || 1;
+    const x = (i) => P.l + (i * (W - P.l - P.r)) / (labels.length - 1);
+    const y = (v) => P.t + (1 - (v - min) / span) * (H - P.t - P.b);
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', title);
+    const add = (tag, attrs, text) => {
+      const n = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      if (text != null) n.textContent = text;
+      svg.appendChild(n);
+      return n;
+    };
+    for (let k = 0; k <= 4; k += 1) {
+      const v = min + (span * k) / 4;
+      const yy = y(v);
+      add('line', { x1: P.l, x2: W - P.r, y1: yy, y2: yy, stroke: '#24314e', 'stroke-width': 1 });
+      add('text', { x: P.l - 6, y: yy + 4, 'text-anchor': 'end', 'font-size': 10, fill: '#a9b4c7' }, `${v.toFixed(0)}${unit}`);
+    }
+    [0, Math.floor((labels.length - 1) / 2), labels.length - 1].forEach((i) => {
+      add('text', { x: x(i), y: H - 8, 'text-anchor': 'middle', 'font-size': 10, fill: '#a9b4c7' }, labels[i]);
+    });
+    series.forEach((s, si) => {
+      add('polyline', { points: s.values.map((v, i) => `${x(i)},${y(v)}`).join(' '), fill: 'none', stroke: s.color, 'stroke-width': 2 });
+      add('rect', { x: P.l + si * 110, y: 6, width: 12, height: 4, fill: s.color });
+      add('text', { x: P.l + 16 + si * 110, y: 11, 'font-size': 10, fill: '#e8edf7' }, s.name);
+    });
+    return svg;
+  }
+
+  const RENDER = {
+    user: (ev, id, scenario) => append(el('div', 'msg-user', scenario.label)),
+    system: (ev) => append(el('div', 'sys', ev.text)),
+    plan: (ev) => {
+      const card = el('details', 'card plan');
+      card.open = true;
+      card.appendChild(el('summary', null, 'Facts Survey · Plan'));
+      card.appendChild(el('div', 'label', 'Facts Survey'));
+      card.appendChild(list(ev.facts));
+      card.appendChild(el('div', 'label', 'Plan'));
+      card.appendChild(list(ev.plan));
+      append(card);
+    },
+    ledger: (ev) => {
+      const card = el('div', `card ledger${ev.blocked ? ' blocked' : ''}`);
+      const head = el('div', 'head');
+      head.appendChild(el('span', 'step', `Progress Ledger #${ev.step}`));
+      head.appendChild(el('span', 'agent', ev.agent));
+      ev.badges.forEach((b) => head.appendChild(el('span', `badge${ev.blocked ? ' warn' : ''}`, b)));
+      card.appendChild(head);
+      card.appendChild(el('div', 'instr', ev.instruction));
+      append(card);
+    },
+    result: (ev) => {
+      const cards = chat.querySelectorAll('.ledger');
+      const last = cards[cards.length - 1];
+      if (last) last.appendChild(el('div', 'result', ev.text));
+      chat.scrollTop = chat.scrollHeight;
+    },
+    urls: (ev) => {
+      const wrap = el('div', 'urls');
+      ev.items.forEach((t) => wrap.appendChild(el('span', 'url', `🔗 ${t}`)));
+      append(wrap);
+    },
+    chart: (ev) => {
+      const box = el('div', 'chart');
+      box.appendChild(el('div', 'cap', `📈 ${ev.title}`));
+      box.appendChild(lineChart(ev));
+      append(box);
+    },
+    answer: (ev) => {
+      streams.set(ev, append(el('div', 'answer streaming')));
+    },
+  };
+
+  // 스트리밍 청크는 play()가 절대 시각으로 미리 예약한다. 타이머를 체인으로 잇지 않아야
+  // 브라우저의 중첩 타이머 최소 지연(4ms)이 누적되지 않고, 종료 시각이 계산과 일치한다.
+  function streamTo(ev, shown) {
+    const box = streams.get(ev);
+    if (!box) return;
+    const part = ev.text.slice(0, shown);
+    if (window.marked) box.innerHTML = window.marked.parse(part);
+    else box.textContent = part;
+    chat.scrollTop = chat.scrollHeight;
+    if (shown >= ev.text.length) box.classList.remove('streaming');
+  }
+
+  function setPresetsDisabled(disabled) {
+    presets.querySelectorAll('.preset').forEach((b) => { b.disabled = disabled; });
+  }
+
+  function reset() {
+    runId += 1;
+    timers.forEach(clearTimeout);
+    timers = [];
+    streams.clear();
+    chat.innerHTML = '';
+    chat.appendChild(el('div', 'empty', EMPTY_TEXT));
+    document.body.dataset.state = 'idle';
+    setPresetsDisabled(false);
+  }
+
+  function play(scenario) {
+    if (document.body.dataset.state === 'running') return;
+    reset();
+    const id = runId;
+    document.body.dataset.state = 'running';
+    setPresetsDisabled(true);
+    let t = 0;
+    scenario.events.forEach((ev) => {
+      t += ev.delay ?? 600;
+      later(() => RENDER[ev.type](ev, id, scenario), t, id);
+      if (ev.type === 'answer') {
+        const steps = Math.ceil(ev.text.length / STREAM_CHUNK);
+        for (let k = 1; k <= steps; k += 1) {
+          const shown = Math.min(ev.text.length, k * STREAM_CHUNK);
+          later(() => streamTo(ev, shown), t + k * STREAM_TICK, id);
+        }
+        t += steps * STREAM_TICK;
+      }
+    });
+    later(() => {
+      document.body.dataset.state = 'done';
+      setPresetsDisabled(false);
+    }, t + 200, id);
+  }
+
+  SCENARIOS.forEach((s) => {
+    const b = el('button', 'preset', s.label);
+    b.type = 'button';
+    b.dataset.scenario = s.id;
+    b.addEventListener('click', () => play(s));
+    presets.appendChild(b);
+  });
+  resetBtn.addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>
