@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 컴패니언 Agent 프로토타입</title>
+<style>
+  :root{ --bg:#0b0f19; --card:#121a2b; --text:#e8edf7; --muted:#a9b4c7; --line:#24314e; --accent:#7aa2ff; --accent2:#8bffd0; --warn:#ffd89a; --pink:#ff9ec7; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif; font-size:15px; line-height:1.6; display:flex; flex-direction:column; overflow-x:hidden; }
+  button{ font:inherit; cursor:pointer; }
+  header{ padding:12px 16px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+  header h1{ font-size:1rem; margin:0; }
+  .notice{ color:var(--muted); font-size:.8rem; }
+  #reset{ padding:6px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:transparent; color:var(--muted); font-size:.85rem; }
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px; border-bottom:1px solid var(--line); }
+  .preset{ padding:7px 12px; border-radius:999px; border:1px solid rgba(122,162,255,.4); background:rgba(122,162,255,.12); color:var(--text); font-size:.88rem; max-width:100%; text-align:left; }
+  .preset:disabled{ opacity:.45; cursor:not-allowed; }
+  .main{ flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); }
+  .chat-col{ display:flex; flex-direction:column; min-height:0; border-right:1px solid var(--line); }
+  .profile{ display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--line); }
+  .avatar{ flex:none; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:.85rem; background:linear-gradient(135deg,#3a4f86,#2a6b63); }
+  .profile .name{ font-weight:700; }
+  .profile .sub{ font-size:.8rem; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px; }
+  #flow{ color:var(--accent2); }
+  #chat{ flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-height:0; }
+  .empty{ color:var(--muted); text-align:center; margin:auto; font-size:.9rem; }
+  .msg-user{ align-self:flex-end; max-width:80%; background:rgba(122,162,255,.22); padding:9px 13px; border-radius:14px 14px 4px 14px; overflow-wrap:anywhere; }
+  .msg-ai{ align-self:flex-start; max-width:85%; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:9px 13px; border-radius:14px 14px 14px 4px; white-space:pre-line; overflow-wrap:anywhere; }
+  .msg-ai.streaming::after{ content:"▍"; color:var(--accent); }
+  .msg-ai .channel{ display:block; margin-top:4px; font-size:.72rem; color:var(--muted); white-space:normal; }
+  .jump{ align-self:center; font-size:.78rem; color:var(--warn); border:1px dashed rgba(255,216,154,.4); border-radius:999px; padding:2px 12px; }
+  .tool-call{ align-self:flex-start; max-width:90%; font-size:.82rem; border:1px solid rgba(139,255,208,.3); background:rgba(139,255,208,.06); border-radius:10px; padding:6px 10px; overflow-wrap:anywhere; }
+  .tool-call b{ color:var(--accent2); font-family:ui-monospace,Consolas,monospace; font-weight:600; }
+  .panel{ overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:14px; min-height:0; }
+  .panel h2{ font-size:.82rem; color:var(--muted); margin:0 0 6px; font-weight:600; letter-spacing:.02em; }
+  .state-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  #emotion{ font-size:.8rem; padding:2px 10px; border-radius:999px; border:1px solid rgba(122,162,255,.4); color:var(--accent); }
+  .gauge{ flex:1; min-width:120px; display:flex; align-items:center; gap:8px; font-size:.8rem; color:var(--muted); }
+  .gauge .bar{ flex:1; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .gauge .fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .4s ease; }
+  #affection-value{ color:var(--text); font-weight:700; }
+  #thought{ margin-top:6px; font-size:.85rem; color:var(--text); background:rgba(255,255,255,.03); border-radius:10px; padding:6px 10px; }
+  .memory-card,.reminder{ font-size:.82rem; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); border-radius:10px; padding:6px 10px; margin-bottom:6px; overflow-wrap:anywhere; }
+  .memory-card.highlight{ border-color:rgba(139,255,208,.5); box-shadow:0 0 0 1px rgba(139,255,208,.2) inset; }
+  .memory-card .meta,.reminder .meta{ display:block; color:var(--muted); font-size:.74rem; }
+  .reminder.done{ opacity:.6; }
+  .reminder.done .meta::after{ content:" · 완료"; color:var(--accent2); }
+  .none{ color:var(--muted); font-size:.8rem; }
+  #logs{ display:flex; flex-direction:column; gap:6px; }
+  .log{ font-size:.78rem; border-left:2px solid var(--line); padding-left:8px; overflow-wrap:anywhere; }
+  .log .node{ color:var(--accent); font-family:ui-monospace,Consolas,monospace; }
+  .badge{ display:inline-block; margin-left:4px; font-size:.68rem; padding:0 7px; border-radius:999px; border:1px solid; white-space:nowrap; }
+  .badge.jev{ color:var(--accent2); border-color:rgba(139,255,208,.4); }
+  .badge.llm{ color:var(--warn); border-color:rgba(255,216,154,.4); }
+  .badge.rule{ color:var(--muted); border-color:rgba(255,255,255,.2); }
+  @media (max-width: 760px){
+    .main{ grid-template-columns:minmax(0,1fr); grid-auto-rows:auto; }
+    .chat-col{ border-right:0; border-bottom:1px solid var(--line); min-height:420px; }
+    .panel{ overflow:visible; }
+    body{ height:auto; min-height:100%; }
+  }
+</style>
+</head>
+<body data-state="idle">
+<header>
+  <div>
+    <h1>AI 컴패니언 Agent</h1>
+    <div class="notice">더미 데이터로 재현한 프로토타입입니다 · 실제 API를 호출하지 않습니다</div>
+  </div>
+  <button id="reset" type="button">처음부터</button>
+</header>
+<div class="presets" id="presets"></div>
+<div class="main">
+  <section class="chat-col">
+    <div class="profile">
+      <div class="avatar" aria-hidden="true">AI</div>
+      <div>
+        <div class="name">AI 컴패니언</div>
+        <div class="sub"><span id="flow">대기 중</span><span id="clock"></span></div>
+      </div>
+    </div>
+    <main id="chat"></main>
+  </section>
+  <aside class="panel" aria-label="내부 상태">
+    <section>
+      <h2>내적 상태</h2>
+      <div class="state-row">
+        <span id="emotion">평온</span>
+        <div class="gauge">호감도 <div class="bar"><div class="fill" id="affection-fill"></div></div><span id="affection-value">58</span></div>
+      </div>
+      <div id="thought"></div>
+    </section>
+    <section>
+      <h2>회상된 기억</h2>
+      <div id="memories"></div>
+    </section>
+    <section>
+      <h2>리마인더</h2>
+      <div id="reminders"></div>
+    </section>
+    <section>
+      <h2>판단 로그</h2>
+      <div id="logs"></div>
+    </section>
+  </aside>
+</div>
+<script>
+(() => {
+  const SPEED = Math.max(1, Number(new URLSearchParams(location.search).get('speed')) || 1);
+  const STREAM_CHUNK = 2;
+  const STREAM_TICK = 35;
+  const EMOTIONS = { neutral: '평온', happy: '기쁨', sad: '슬픔', surprised: '놀람', annoyed: '언짢음' };
+  const INITIAL = { emotion: 'neutral', affection: 58, thought: '오늘은 조용한 하루네.', clock: '10/05 (일) 19:20' };
+
+  const SCENARIOS = [
+    {
+      id: 'recall',
+      label: '🧠 기억 회상',
+      events: [
+        { type: 'user', text: '지난번에 말한 라멘집 이름이 뭐였지?', delay: 100 },
+        { type: 'flow', text: '생각 중...', delay: 300 },
+        { type: 'log', node: 'RetrieveMemoryNode', text: '장기기억 하이브리드 검색 (벡터 + BM25 → RRF)', delay: 700 },
+        { type: 'recall', delay: 600, items: [
+          { text: '사용자는 회사 근처 「멘야 하루」의 돈코츠 라멘을 좋아한다', meta: 'Memory · 2주 전 대화 · 근거 3건' },
+          { text: '사용자는 매운 음식보다 진한 국물을 선호한다', meta: 'Observation · likes' },
+        ] },
+        { type: 'log', node: 'PlanningNode', text: '회상한 기억으로 답변 가능 → sufficient', badge: { kind: 'jev', text: 'Jev ✓ 0.97' }, delay: 800 },
+        { type: 'log', node: 'ResponseDecisionNode', text: '이미지 불필요 · 리마인더 없음', badge: { kind: 'jev', text: 'Jev ✓ 0.94' }, delay: 600 },
+        { type: 'flow', text: '응답 보내는 중', delay: 300 },
+        { type: 'assistant', text: '멘야 하루. 회사 근처 돈코츠 라멘집이라고 했잖아. 진한 국물 좋아한다더니, 또 가고 싶어진 거야?', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+        { type: 'log', node: 'UpdateStateNode', text: '상태 델타: 호감도 +2, 감정 → 기쁨', badge: { kind: 'llm', text: 'LLM' }, delay: 700 },
+        { type: 'state', emotion: 'happy', affection: 60, thought: '좋아하는 걸 기억해 둔 게 통했네. 나도 라멘이 좀 궁금해졌어.', delay: 300 },
+        { type: 'log', node: 'ExtractCandidatesNode', text: '기억할 새 정보 없음 → 추출 생략', badge: { kind: 'jev', text: 'Jev 게이트 ✓ 0.91' }, delay: 600 },
+      ],
+    },
+    {
+      id: 'proactive',
+      label: '⏩ 2시간 경과 (선제 메시지)',
+      events: [
+        { type: 'jump', text: '⏩ 2시간 경과', clock: '10/05 (일) 21:20', delay: 100 },
+        { type: 'log', node: 'ProactiveScheduler', text: '선제대화 틱 · 마지막 대화로부터 2시간', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'flow', text: '생각 중...', delay: 200 },
+        { type: 'recall', delay: 600, items: [
+          { text: '사용자는 내일 오전 발표 자료를 준비하고 있다', meta: 'Memory · 오늘 오후 대화' },
+          { text: '마지막 슬라이드 구성에서 막혀 있다고 했다', meta: 'Observation · experienced' },
+        ] },
+        { type: 'log', node: 'EvaluateProactiveNode', text: '최근 기억·상태·세계 상태 검토 → 말을 걸기로 결정', badge: { kind: 'llm', text: 'LLM' }, delay: 900 },
+        { type: 'log', node: 'SelectDeliveryChannelNode', text: '웹 연결 없음 → 텔레그램', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'log', node: 'MessageAgent', text: '선제 메시지 생성', badge: { kind: 'llm', text: 'LLM' }, delay: 600 },
+        { type: 'log', node: '전송 직전 재검증', text: '새 사용자 메시지 없음 · 상태 변화 없음 → 전송', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'flow', text: '응답 보내는 중', delay: 200 },
+        { type: 'assistant', text: '발표 자료는 다 만들었어? 아까 마지막 슬라이드에서 막힌다고 했잖아. 아직이면 같이 보자.', channel: '텔레그램으로 전송', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+        { type: 'state', thought: '내일 발표가 잘 끝났으면 좋겠어.', delay: 500 },
+      ],
+    },
+    {
+      id: 'reminder',
+      label: '⏰ 리마인더',
+      events: [
+        { type: 'user', text: '내일 아침 9시에 회의 있는 거 알려줘', delay: 100 },
+        { type: 'flow', text: '생각 중...', delay: 300 },
+        { type: 'log', node: 'PlanningNode', text: '기억 검색 불필요 → sufficient', badge: { kind: 'jev', text: 'Jev ✓ 0.95' }, delay: 700 },
+        { type: 'log', node: 'ResponseDecisionNode', text: '리마인더 요청 감지 → LLM으로 세부 판단', badge: { kind: 'llm', text: 'Jev → LLM' }, delay: 700 },
+        { type: 'flow', text: '응답 보내는 중', delay: 200 },
+        { type: 'assistant', text: '알았어. 내일 8시 50분에 말해 줄게. 너무 늦게 자지 마.', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+        { type: 'log', node: 'ExtractResponsePromisesNode', text: '응답 속 약속 추출: 내일 08:50 회의 알림', badge: { kind: 'llm', text: '정규식 ✓ → LLM' }, delay: 700 },
+        { type: 'reminder', text: '오전 9시 회의 알림', due: '내일 08:50', delay: 400 },
+        { type: 'jump', text: '⏩ 다음 날 08:50', clock: '10/06 (월) 08:50', delay: 1000 },
+        { type: 'log', node: 'ReminderScheduler', text: '기한 도래 · 이후 대화로 무효화되지 않음 → 발화', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'flow', text: '응답 보내는 중', delay: 200 },
+        { type: 'assistant', text: '9시 회의 10분 전이야. 자료 챙겼지?', channel: '텔레그램으로 전송', delay: 300 },
+        { type: 'reminderDone', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+      ],
+    },
+    {
+      id: 'tool',
+      label: '🛠 Tool 위임',
+      events: [
+        { type: 'user', text: '이번 주 엔비디아 관련 이슈 정리해줘', delay: 100 },
+        { type: 'flow', text: '생각 중...', delay: 300 },
+        { type: 'log', node: 'RetrieveMemoryNode', text: '관련 기억 없음', delay: 600 },
+        { type: 'log', node: 'PlanningNode', text: '투자 리서치 필요 → needs_tool', badge: { kind: 'jev', text: 'Jev ✓ 0.92' }, delay: 700 },
+        { type: 'tool', name: 'investment_agent', text: 'MCP · 투자 비서 Agent에 리서치 요청 → 뉴스 6건, 주가 흐름 요약', delay: 1100 },
+        { type: 'tool', name: 'agent_work', text: 'Codex CLI에 위임 · 받은 리서치를 이슈별로 묶어 요약', delay: 1200 },
+        { type: 'flow', text: '응답 보내는 중', delay: 400 },
+        { type: 'assistant', text: '이번 주 엔비디아 이슈는 세 갈래야.\n1. 실적 발표를 앞두고 데이터센터 매출 기대가 커졌어.\n2. 신규 GPU 출시 일정 얘기가 다시 나왔고.\n3. 수출 규제 관련 뉴스는 아직 결론이 없어.\n(데모용 예시 요약이야)', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+      ],
+    },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const chat = $('chat');
+  const presets = $('presets');
+  let timers = [];
+  let runId = 0;
+  const streams = new Map();
+
+  function later(fn, ms, id) {
+    const t = setTimeout(() => { if (id === runId) fn(); }, ms / SPEED);
+    timers.push(t);
+  }
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function append(node) {
+    const empty = chat.querySelector('.empty');
+    if (empty) empty.remove();
+    chat.appendChild(node);
+    chat.scrollTop = chat.scrollHeight;
+    return node;
+  }
+
+  function setState({ emotion, affection, thought }) {
+    if (emotion) $('emotion').textContent = EMOTIONS[emotion];
+    if (affection != null) {
+      $('affection-value').textContent = String(affection);
+      $('affection-fill').style.width = `${Math.max(0, Math.min(100, affection))}%`;
+    }
+    if (thought) $('thought').textContent = `💭 ${thought}`;
+  }
+
+  function placeholder(container, text) {
+    container.innerHTML = '';
+    container.appendChild(el('div', 'none', text));
+  }
+
+  function addCard(container, cls, text, meta) {
+    const none = container.querySelector('.none');
+    if (none) none.remove();
+    const card = el('div', cls, text);
+    card.appendChild(el('span', 'meta', meta));
+    container.appendChild(card);
+    return card;
+  }
+
+  const RENDER = {
+    user: (ev) => append(el('div', 'msg-user', ev.text)),
+    flow: (ev) => { $('flow').textContent = ev.text; },
+    jump: (ev) => { append(el('div', 'jump', ev.text)); $('clock').textContent = ev.clock; },
+    log: (ev) => {
+      const row = el('div', 'log');
+      row.appendChild(el('span', 'node', ev.node));
+      row.appendChild(document.createTextNode(` ${ev.text}`));
+      if (ev.badge) row.appendChild(el('span', `badge ${ev.badge.kind}`, ev.badge.text));
+      $('logs').appendChild(row);
+    },
+    recall: (ev) => {
+      const box = $('memories');
+      box.querySelectorAll('.memory-card.highlight').forEach((c) => c.classList.remove('highlight'));
+      ev.items.forEach((m) => addCard(box, 'memory-card highlight', m.text, m.meta));
+    },
+    state: (ev) => setState(ev),
+    reminder: (ev) => addCard($('reminders'), 'reminder', `⏰ ${ev.text}`, ev.due),
+    reminderDone: () => {
+      const items = $('reminders').querySelectorAll('.reminder');
+      if (items.length) items[items.length - 1].classList.add('done');
+    },
+    tool: (ev) => {
+      const card = el('div', 'tool-call');
+      card.dataset.tool = ev.name;
+      card.appendChild(el('b', null, ev.name));
+      card.appendChild(document.createTextNode(` ${ev.text}`));
+      append(card);
+    },
+    assistant: (ev) => {
+      const bubble = append(el('div', 'msg-ai streaming'));
+      bubble.appendChild(el('span', 'body'));
+      streams.set(ev, bubble);
+    },
+  };
+
+  // 스트리밍 청크는 play()가 절대 시각으로 미리 예약한다. 타이머를 체인으로 잇지 않아야
+  // 브라우저의 중첩 타이머 최소 지연(4ms)이 누적되지 않고, 종료 시각이 계산과 일치한다.
+  function streamTo(ev, shown) {
+    const bubble = streams.get(ev);
+    if (!bubble) return;
+    bubble.querySelector('.body').textContent = ev.text.slice(0, shown);
+    chat.scrollTop = chat.scrollHeight;
+    if (shown >= ev.text.length) {
+      bubble.classList.remove('streaming');
+      if (ev.channel) bubble.appendChild(el('span', 'channel', ev.channel));
+    }
+  }
+
+  function setPresetsDisabled(disabled) {
+    presets.querySelectorAll('.preset').forEach((b) => { b.disabled = disabled; });
+  }
+
+  function reset() {
+    runId += 1;
+    timers.forEach(clearTimeout);
+    timers = [];
+    streams.clear();
+    chat.innerHTML = '';
+    chat.appendChild(el('div', 'empty', '위의 시나리오 중 하나를 눌러 보세요.'));
+    $('logs').innerHTML = '';
+    placeholder($('memories'), '아직 회상한 기억이 없습니다.');
+    placeholder($('reminders'), '등록된 리마인더가 없습니다.');
+    $('flow').textContent = '대기 중';
+    $('clock').textContent = INITIAL.clock;
+    setState(INITIAL);
+    document.body.dataset.state = 'idle';
+    setPresetsDisabled(false);
+  }
+
+  function play(scenario) {
+    if (document.body.dataset.state === 'running') return;
+    reset();
+    const id = runId;
+    document.body.dataset.state = 'running';
+    setPresetsDisabled(true);
+    let t = 0;
+    scenario.events.forEach((ev) => {
+      t += ev.delay ?? 600;
+      later(() => RENDER[ev.type](ev, id), t, id);
+      if (ev.type === 'assistant') {
+        const steps = Math.ceil(ev.text.length / STREAM_CHUNK);
+        for (let k = 1; k <= steps; k += 1) {
+          const shown = Math.min(ev.text.length, k * STREAM_CHUNK);
+          later(() => streamTo(ev, shown), t + k * STREAM_TICK, id);
+        }
+        t += steps * STREAM_TICK;
+      }
+    });
+    later(() => {
+      document.body.dataset.state = 'done';
+      setPresetsDisabled(false);
+    }, t + 200, id);
+  }
+
+  SCENARIOS.forEach((s) => {
+    const b = el('button', 'preset', s.label);
+    b.type = 'button';
+    b.dataset.scenario = s.id;
+    b.addEventListener('click', () => play(s));
+    presets.appendChild(b);
+  });
+  $('reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

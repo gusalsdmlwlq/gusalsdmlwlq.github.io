@@ -209,10 +209,55 @@ title: Portfolio - Hyunmin Jeon
     <div class="card">
       <div class="item">
         <div class="top">
+          <div class="role">AI 컴패니언 Agent</div>
+        </div>
+        <div class="pills">
+          <em>Generative Agent</em><em>Agentic Workflow</em><em>Google ADK</em><em>Long-term Memory</em><em>Knowledge Graph</em><em>MCP</em><em>Agent as Tool</em><em>Proactive Agent</em><em>Jev Hybrid Decision</em><em>ComfyUI</em>
+        </div>
+        <ul class="list-tight">
+          <li>대화를 기억하고 먼저 말을 거는 AI 컴패니언 겸 개인 비서 Agent 개발
+              <ul>
+                  <li>캐릭터 페르소나 기반 대화와 영속적 내적 상태(감정, 호감도, 생각)</li>
+                  <li>백그라운드 세계 시뮬레이션과 선제적 대화, 대화 속 약속 기반 리마인더</li>
+              </ul>
+          </li>
+          <li>Knowledge Graph 기반 장기기억
+              <ul>
+                  <li>LLM으로 대화에서 관측을 추출해 Knowledge Graph 자동 구축</li>
+                  <li>벡터 + BM25 RRF 하이브리드 검색으로 기억 회상</li>
+                  <li>일일 회고로 관측을 Memory로 요약</li>
+              </ul>
+          </li>
+          <li>Tool 기반 개인 비서 기능
+              <ul>
+                  <li>웹 검색 및 Codex / Claude CLI 작업 위임</li>
+                  <li>MCP로 투자 비서 Agent, 포트폴리오 Agent를 Tool로 호출</li>
+              </ul>
+          </li>
+          <li>경량 decision 모델 기반 LLM 판단 효율화
+              <ul>
+                  <li>Jev 하이브리드 판단(게이트 / 캐스케이드)으로 불필요한 LLM 호출 절감</li>
+                  <li>섀도 모드로 실데이터 일치율을 측정한 뒤 노드별로 단계적 적용</li>
+              </ul>
+          </li>
+          <li>멀티모달 · 멀티 채널 인터페이스
+              <ul>
+                  <li>로컬 ComfyUI 연동 이미지 생성 파이프라인 (Base + LoRA, 얼굴·손 디테일러)</li>
+                  <li>웹(Live2D) / 텔레그램 / 데스크탑(Tauri) / Android가 하나의 대화 세션 공유</li>
+              </ul>
+          </li>
+        </ul>
+        <div class="project-actions">
+          <a class="btn" href="{{ '/projects/ai-companion-agent/' | relative_url }}">자세히 보기 →</a>
+          <a class="btn" href="{{ '/demos/ai-companion-agent/' | relative_url }}" target="_blank" rel="noopener">▶ 데모 체험</a>
+        </div>
+      </div>
+      <div class="item">
+        <div class="top">
           <div class="role">투자 비서 Agent</div>
         </div>
         <div class="pills">
-          <em>Generative Agent</em><em>Multi-Agent</em><em>Knowledge Graph</em><em>Python</em><em>Elastic Search</em><em>Neo4j</em><em>Flutter</em><em>GCP</em>
+          <em>Multi-Agent Orchestration</em><em>Dynamic Planning</em><em>Graph RAG</em><em>Knowledge Graph</em><em>Hybrid Search (RRF)</em><em>WebSocket Streaming</em><em>Elasticsearch</em><em>Neo4j</em><em>InfluxDB</em><em>Flutter</em>
         </div>
         <ul class="list-tight">
           <li>Multi-Agent 기반 주식 투자 비서 서비스 개발
@@ -242,13 +287,17 @@ title: Portfolio - Hyunmin Jeon
             </ul>
           </li>
         </ul>
+        <div class="project-actions">
+          <a class="btn" href="{{ '/projects/investment-agent/' | relative_url }}">자세히 보기 →</a>
+          <a class="btn" href="{{ '/demos/investment-agent/' | relative_url }}" target="_blank" rel="noopener">▶ 데모 체험</a>
+        </div>
       </div>
       <div class="item">
         <div class="top">
           <div class="role">포트폴리오 Agent</div>
         </div>
         <div class="pills">
-          <em>Generative Agent</em><em>Agentic RAG</em><em>Graph RAG</em><em>Knowledge Graph</em><em>Python</em><em>Neo4j</em><em>GCP</em><em>Github Page</em>
+          <em>Graph RAG</em><em>Agentic RAG</em><em>Knowledge Graph</em><em>Google ADK</em><em>Leiden Community Detection</em><em>Personalized PageRank</em><em>Hybrid Search (RRF)</em><em>Neo4j</em><em>MCP</em><em>GitHub Pages</em>
         </div>
         <ul class="list-tight">
           <li>이력/경력 사항 및 업무/프로젝트 경험을 관리하기 위한 Graph RAG Agent 서비스 개발
@@ -264,6 +313,10 @@ title: Portfolio - Hyunmin Jeon
               </ul>
           </li>
         </ul>
+        <div class="project-actions">
+          <a class="btn" href="{{ '/projects/portfolio-agent/' | relative_url }}">자세히 보기 →</a>
+          <a class="btn" href="{{ '/projects/portfolio-agent/#demo' | relative_url }}">▶ 데모 체험</a>
+        </div>
       </div>
       <div class="item">
         <div class="top">

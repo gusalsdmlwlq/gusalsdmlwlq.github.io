@@ -315,3 +315,15 @@ html, body { width: 100%; }
 }
 
 html { scroll-behavior: smooth; }
+
+/* ===== Side project actions ===== */
+.project-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.project-actions .btn{
+  padding:7px 12px;
+  font-size:.9rem;
+}

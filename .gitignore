@@ -1,0 +1,15 @@
+# Local Jekyll preview
+Gemfile
+Gemfile.lock
+docker-compose.yml
+vendor/
+_site/
+.sass-cache/
+.jekyll-cache/
+
+# Local tests
+__pycache__/
+.pytest_cache/
+
+# Local-only disclosure check terms
+_tests/.banned_terms

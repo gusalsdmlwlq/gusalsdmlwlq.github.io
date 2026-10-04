@@ -1,0 +1,54 @@
+---
+layout: default
+---
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+<link rel="stylesheet" href="{{ '/assets/css/project.css' | relative_url }}" />
+
+<div class="layout project-page">
+  <aside class="toc">
+    <div class="toc-box">
+      <div class="toc-title">Contents</div>
+      <nav id="project-toc" aria-label="페이지 목차"></nav>
+    </div>
+  </aside>
+  <main class="content project-content">
+    <a class="back-link" href="{{ '/' | relative_url }}#side-project">← 포트폴리오로 돌아가기</a>
+    <div class="card project-hero">
+      <h1>{{ page.title }}</h1>
+      {% if page.subtitle %}<p class="project-subtitle">{{ page.subtitle }}</p>{% endif %}
+      {% if page.tags %}
+      <div class="pills">{% for tag in page.tags %}<em>{{ tag }}</em>{% endfor %}</div>
+      {% endif %}
+    </div>
+
+    <div class="project-body">
+      {{ content }}
+    </div>
+
+    {% if page.demo and page.demo.type == 'prototype' %}
+    <template id="demo-template">
+      <div class="demo-block">
+        <div class="demo-bar">
+          <span>🧪 인터랙티브 프로토타입 · 더미 데이터</span>
+          <a href="{{ page.demo.src | relative_url }}" target="_blank" rel="noopener">새 창 ↗</a>
+        </div>
+        <iframe class="demo-frame" src="{{ page.demo.src | relative_url }}" title="{{ page.title }} 프로토타입" loading="lazy" style="height: {{ page.demo.height | default: 640 }}px"></iframe>
+      </div>
+    </template>
+    {% elsif page.demo and page.demo.type == 'live-chatbot' %}
+    <template id="demo-template">
+      <div class="demo-block demo-live">
+        <p>이 페이지 오른쪽 아래의 💬 챗봇이 바로 이 시스템입니다. 실제 운영 중인 서버에 연결되어 있습니다.</p>
+        <button type="button" class="btn demo-open-chat" data-open-chat data-question="">💬 챗봇 열기</button>
+        {% if page.demo.questions %}
+        <div class="demo-questions">
+          {% for q in page.demo.questions %}<button type="button" class="demo-question" data-open-chat data-question="{{ q | escape }}">{{ q }}</button>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </template>
+    {% endif %}
+  </main>
+</div>
+
+<script src="{{ '/assets/js/project.js' | relative_url }}" defer></script>

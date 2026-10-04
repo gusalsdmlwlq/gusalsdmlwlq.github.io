@@ -1,0 +1,43 @@
+/* 사이드 프로젝트 상세 페이지 — style.css의 토큰(--text, --muted, --line, --accent ...)을 재사용한다 */
+.project-content{ min-width: 0; }
+
+.back-link{ display:inline-block; margin-bottom:14px; color:var(--muted); font-size:.95rem; }
+.back-link:hover{ color:var(--text); }
+
+.project-hero h1{ margin:0 0 6px; }
+.project-subtitle{ color:var(--muted); margin:0 0 10px; font-size:1.05rem; }
+
+.project-body{ margin-top: 8px; }
+.project-body h2{ scroll-margin-top: 16px; }
+.project-body h3{ margin-top: 22px; }
+.project-body p,
+.project-body li{ line-height: 1.75; color: var(--text); }
+.project-body li{ margin: 6px 0; }
+.project-body code{ background: rgba(122,162,255,.12); color: var(--text); border: 0; border-radius: 6px; padding: 1px 6px; font-size: .9em; }
+.project-body pre,
+.project-body .highlight{ background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 12px; color: var(--text); }
+.project-body pre code{ background: transparent; padding: 0; }
+
+.project-body table{ display:block; width:max-content; max-width:100%; overflow-x:auto; border:0; border-collapse: collapse; margin: 12px 0; }
+.project-body th,
+.project-body td{ border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; color: var(--text); }
+.project-body th{ background: rgba(255,255,255,.05); }
+.project-body table tr,
+.project-body table tr:nth-child(even){ background: transparent; }
+
+.project-body .mermaid{ background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: 14px; padding: 16px; margin: 14px 0; overflow-x: auto; text-align: center; }
+
+.demo-block{ border: 1px solid rgba(255,255,255,.10); border-radius: 16px; overflow: hidden; background: #0a0e17; margin: 12px 0 8px; }
+.demo-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.08); color:var(--muted); font-size:.9rem; }
+.demo-frame{ display:block; width:100%; border:0; background: var(--bg); }
+
+.demo-live{ padding: 18px; }
+.demo-live p{ margin: 0 0 12px; }
+.demo-live .btn{ cursor: pointer; font: inherit; }
+.demo-questions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.demo-question{ cursor:pointer; font: inherit; font-size:.9rem; padding:7px 12px; border-radius:999px; border:1px solid rgba(122,162,255,.35); background: rgba(122,162,255,.10); color: var(--text); text-align:left; }
+.demo-question:hover{ background: rgba(122,162,255,.18); }
+
+@media (max-width: 860px){
+  .demo-frame{ height: 760px !important; }
+}
