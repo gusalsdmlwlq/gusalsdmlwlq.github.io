@@ -29,6 +29,7 @@ WebSocket `/chat-stream`으로 들어온 질문을 Manager가 다음 순서로 �
 - **Final Answer**: 분석 결과와 시각화 메타데이터를 바탕으로 최종 답변을 생성합니다.
 
 ### 2. 전문 에이전트
+
 | 에이전트 | 역할 |
 |---|---|
 | WebSearcher | Tavily 웹·뉴스 검색 |
