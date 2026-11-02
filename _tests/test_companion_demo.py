@@ -29,6 +29,9 @@ def test_recall_scenario(page, base_url):
     expect(page.locator("#chat .msg-ai")).to_have_count(1)
     assert page.locator("#memories .memory-card.highlight").count() >= 1
     assert page.locator("#logs .badge.jev").count() >= 2
+    planning = page.locator("#logs .log").filter(has=page.locator(".node", has_text="계획 판단"))
+    expect(planning.locator(".badge.llm")).to_have_count(1)
+    expect(planning.locator(".badge.jev")).to_have_count(0)
     expect(page.locator("#emotion")).to_have_text("기쁨")
     expect(page.locator("#affection-value")).to_have_text("60")
     expect(page.locator("#flow")).to_have_text("대기 중")
@@ -55,7 +58,14 @@ def test_tool_scenario(page, base_url):
     page.goto(base_url + FAST)
     _play(page, "tool")
     expect(page.locator('#chat .tool-call[data-tool="investment_agent"]')).to_have_count(1)
-    expect(page.locator('#chat .tool-call[data-tool="agent_work"]')).to_have_count(1)
+    expect(page.locator("#chat .tool-call")).to_have_count(1)
+    expect(page.locator("#chat .msg-ai")).to_have_count(2)
+    expect(page.locator("#chat .msg-ai").first).to_contain_text("따로 알려줄게")
+    expect(page.locator("#chat .msg-ai .channel")).to_have_text("작업 완료 후 별도 전달")
+    planning = page.locator("#logs .log").filter(has=page.locator(".node", has_text="계획 판단"))
+    expect(planning).to_have_count(2)
+    expect(planning.locator(".badge.jev")).to_have_count(0)
+    expect(planning.locator(".badge.llm")).to_have_count(2)
     expect(page.locator("#chat .roadmap")).to_have_count(0)
 
 
@@ -125,4 +135,4 @@ def test_streaming_finishes_before_done(page, base_url, scenario):
     last = page.locator("#chat > *").last
     if scenario == "tool":
         assert "msg-ai" in last.get_attribute("class")
-        assert page.locator("#chat .msg-ai").last.inner_text().strip().endswith("(데모용 예시 요약이야)")
+        assert page.locator("#chat .msg-ai").last.locator(".body").inner_text().strip().endswith("(데모용 예시 요약이야)")

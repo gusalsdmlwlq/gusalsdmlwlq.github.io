@@ -1,9 +1,9 @@
 ---
 layout: project
 title: AI 컴패니언 Agent
-subtitle: 대화를 기억하고 먼저 말을 걸며, 다른 Agent를 도구로 활용하는 AI 컴패니언 겸 개인 비서 Agent
-description: 대화를 기억하고 먼저 말을 걸며, 다른 Agent를 도구로 활용하는 AI 컴패니언 겸 개인 비서 Agent
-tags: [Generative Agent, Agentic Workflow, Google ADK, Long-term Memory, Knowledge Graph, MCP, Agent as Tool, Proactive Agent, Jev Hybrid Decision, ComfyUI]
+subtitle: 대화를 기억하고 먼저 말을 걸며, 가상 세계와 외부 도구를 연결하는 개인 AI 컴패니언
+description: 대화를 기억하고 먼저 말을 걸며, 가상 세계와 외부 도구를 연결하는 개인 AI 컴패니언
+tags: [Generative Agent, Agentic Workflow, Google ADK, Long-term Memory, Knowledge Graph, MCP, Agent as Tool, Proactive Agent, Hybrid Decision, ComfyUI]
 demo:
   type: prototype
   src: /demos/ai-companion-agent/
@@ -12,7 +12,9 @@ demo:
 
 ## Overview
 
-캐릭터 페르소나를 가진 AI 컴패니언이자 개인 비서 Agent입니다. 대화를 장기기억으로 쌓고, 자신의 상태와 일상을 가지며, 필요하면 먼저 말을 겁니다. 복잡한 작업은 Codex/Claude CLI에 위임하고, 함께 개발한 [투자 비서 Agent](../investment-agent/)·[포트폴리오 Agent](../portfolio-agent/) 같은 다른 Agent들을 MCP로 Tool처럼 호출해 일상 대화 안에서 업무를 처리합니다.
+캐릭터 페르소나를 가진 AI 컴패니언이자 개인 비서 Agent입니다. 대화에서 기억을 쌓고, 감정과 일상을 유지하며, 상황에 따라 먼저 말을 겁니다. 사용자와 캐릭터의 위치를 독립적으로 관리하는 가상 세계에서 대화와 이미지 공유를 연결했습니다.
+
+기억만으로 답하기 어려우면 웹 검색이나 Codex/Claude CLI 작업 위임을 사용합니다. [투자 비서 Agent](../investment-agent/)·[포트폴리오 Agent](../portfolio-agent/)의 스킬과 읽기용 MCP를 연동해 전문 리서치와 경력 분석을 맡기고, 오래 걸리는 작업은 접수 후 결과를 별도로 전달합니다.
 
 ## Demo
 
@@ -20,116 +22,79 @@ demo:
 
 ## Key Features
 
-### 1. 장기기억 Knowledge Graph
-- 응답을 보낸 직후 비동기로 관측 후보를 추출합니다. 대화 흐름은 막지 않습니다.
-- 엔티티 해석: 임베딩으로 기존 엔티티 후보를 찾고, LLM이 같은 대상인지 판단합니다.
-- 단일 Entity 노드와 append-only Observation 관계로 저장합니다. 같은 관계가 반복되는 것 자체를 선호의 강도 신호로 씁니다.
-- 회상은 벡터 + BM25 검색을 RRF로 결합합니다.
-- 매일 새벽 **일일 회고**를 돌려 전날 관측을 근거 ID로 연결된 Memory로 요약합니다. 원본 관측은 보존합니다.
+### 1. 근거를 보존하는 장기기억
+- 응답 후 비동기로 대화의 관측 사실을 추출하고, 기존 엔티티를 식별·연결해 Neo4j에 저장합니다.
+- 벡터·전문 검색을 RRF로 결합하여 요약 기억과 원본 관측을 회상합니다. 최근 대화 문맥을 보조 검색에 활용합니다.
+- 매일 종료된 기록 기간의 관측을 요약 기억으로 정리합니다. 원본 근거 ID를 유지하고 사실 요약과 캐릭터의 주관적 회고를 구분합니다.
+- 현실·가상 경험의 범위와 출처를 함께 보존하여, 가상 세계의 사건을 사용자의 현실 행동으로 혼동하지 않도록 합니다.
 
-### 2. 공유 회상 서브워크플로우
-- 검색 → Planning(`sufficient` / `insufficient` / `needs_tool`) → 확장 검색 또는 Tool Agent 순서입니다.
-- 일반 대화와 선제적 대화가 같은 서브워크플로우를 조립해 사용합니다.
+### 2. 계획 판단과 도구 실행
+- 기본 기억 검색 후 LLM이 답변할지, 도구를 더 사용할지 결정합니다. 도구 결과를 받아 다시 판단하는 루프를 일반 대화와 선제적 대화가 공유합니다.
+- 도구는 기억 검색, 웹 검색, 사용자 메모 저장·조회·수정, CLI 작업 위임으로 구성합니다. 메모의 사용자 수정과 AI 제안을 분리합니다.
+- 전문 Agent 연동은 백그라운드 작업으로 접수하고 완료 후 전달합니다. 접수를 작업 완료로 취급하지 않습니다.
+- 도구 인자를 스키마로 검증하고, 호출 횟수·전체 시간·문맥 크기를 제한합니다. 같은 턴의 동일 호출은 이전 결과를 재사용합니다.
 
-### 3. Tool Agent: 개인 비서 기능
-- 회상 단계의 Planning이 도구가 필요하다고 판단하면(`needs_tool`) Tool Agent로 라우팅합니다.
-- `web_search`: Tavily 웹 검색
-- `agent_work`: 격리된 임시 디렉터리에서 Codex/Claude CLI에 리서치, 계산, 코딩, 작성 같은 작업을 위임합니다.
-- **Agent as Tool**: MCP 클라이언트로 투자 비서 Agent, 포트폴리오 Agent 같은 다른 Agent를 Tool로 호출해 결과를 대화에 녹입니다.
-- 대화 그래프는 턴당 LLM 호출 수를 예측할 수 있는 bounded-step 구조로 유지하고, 자유로운 도구 루프는 ToolAgentNode 안에서만 허용합니다.
+### 3. 선제적 대화와 영속적인 가상 세계
+- 최근 대화·기억·수면·활성 상태를 보고 먼저 말을 걸지 판단하며, 응답 속 약속을 추출해 리마인더로 저장합니다.
+- 백그라운드에서 캐릭터의 행동·장소·의상을 갱신하고, 월드 이벤트를 대화의 계기로 연결합니다.
+- 사용자와 캐릭터의 위치, 가상 세계 입장 상태를 별도로 관리합니다. 같은 장소인지에 따라 대면 상황과 통신창 대화를 구분합니다.
+- 생성 도중 새 메시지나 장면 변화가 생기면 전송 전에 재검증합니다. 웹 연결 여부에 따른 전달과 Telegram 미러링을 지원합니다.
 
-### 4. 선제적 대화
-- 독립 스케줄러가 대화 공백, 최근 기억, 상태를 보고 먼저 말을 걸지 판단합니다.
-- 응답 속 약속(「내일 알려줄게」)을 추출해 리마인더로 저장하고, 기한이 되면 연락합니다.
-- 웹 연결 여부에 따라 전달 채널(웹 / 텔레그램)을 자동으로 고릅니다.
+### 4. 경량 판단 모델을 활용한 LLM 효율화
+- 경량 판단 모델(Jev)이 변경·추출 필요 여부 등을 먼저 판단하고, 복잡한 판단은 LLM으로 넘기는 게이트·캐스케이드 구조를 구현했습니다.
+- 노드별로 LLM 단독, 섀도 비교, 신뢰도 기반 채택, Jev 우선 모드를 선택할 수 있습니다. 도구 인자를 생성하는 계획 단계는 LLM이 담당합니다.
+- 섀도 모드는 실제 LLM 결과를 유지하면서 Jev와의 일치 여부를 기록합니다. 운영 중 표본 비교와 실패 시 폴백을 지원합니다.
+- 비교 일치율은 두 모델의 판단 차이를 확인하는 지표이며, 정답률이나 비용 절감률과 구분합니다.
 
-### 5. 영속적 내적 상태와 세계 시뮬레이션
-- 매 턴 델타 기반으로 내적 상태를 갱신합니다: 호감도, 현재 감정, 지속 불만, 최근 생각.
-- 백그라운드에서 주기적으로 행동·장소·의상을 정하는 「세계」를 돌립니다.
-- 두 상태가 응답 생성과 선제 판단에 함께 반영됩니다.
-
-### 6. Jev 하이브리드 판단 (LLM 효율화)
-- 자유 텍스트 대신 타입이 정해진 답(boolean/choice)과 확률만 돌려주는 경량 decision 모델 **Jev**를 LLM과 하이브리드로 씁니다.
-- 노드별 모드를 설정만으로 바꾸고 되돌릴 수 있습니다.
-
-| 모드 | 동작 |
-|---|---|
-| `llm` | LLM만 사용 |
-| `shadow` | LLM 판단을 쓰고, Jev는 응답 경로 밖에서 비교 기록만 남김 |
-| `cascade` | Jev confidence가 임계값 이상이면 채택, 아니면 LLM |
-| `jev` | Jev를 채택하고, 호출 실패 시에만 LLM으로 폴백 |
-
-- **게이트 패턴**: 대부분 「변경 없음」으로 끝나는 노드 앞에서, LLM 호출이 필요한지만 Jev가 먼저 판단합니다.
-- 운영 중에도 일부 턴을 섀도로 돌리는 점검 샘플링으로 불일치를 계속 측정합니다.
-
-### 7. 로컬 이미지 생성 (ComfyUI 연동)
-- Windows GPU에서 도는 ComfyUI를 WSL의 코어 서버가 HTTP API로 호출합니다.
-- LLM이 상황 묘사를 태그형 포즈 프롬프트로 바꾸고, 세계 상태의 의상·장소와 결합합니다.
-- 워크플로우: Base 모델 + Character LoRA → 얼굴·손 bbox 검출 디테일러
-- 응답 판단 노드가 필요하다고 판단할 때만, 비동기로 드물게 전송합니다.
-
-### 8. 멀티 채널 단일 세션
-- 웹(Live2D), 텔레그램, Tauri 데스크탑(월페이퍼 모드), Android 앱이 하나의 대화 세션을 공유합니다.
-- 응답은 토큰 스트리밍으로 전달합니다.
+### 5. 이미지 공유와 멀티 채널 인터페이스
+- 최종 응답에 포함된 모습·사진 공유 행동을 해석해, 텍스트 전달 후 ComfyUI 이미지 생성을 비동기로 실행합니다.
+- 장면 설명을 태그형 프롬프트로 바꾸고 의상·장소와 결합합니다. Character LoRA와 얼굴·손 디테일러를 적용합니다.
+- 생성·전송 전에 장면 변경 여부를 확인하고, 이미지를 대화 이력과 갤러리에 연결합니다.
+- 웹(Live2D), Telegram, Tauri 데스크탑·Android 앱이 하나의 대화 세션을 공유하며 응답을 스트리밍합니다.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  subgraph CH["채널"]
-    WEB["웹 · Live2D"]
-    TG["텔레그램"]
-    DT["Tauri 데스크탑"]
-    AND["Android"]
-  end
-  subgraph CONV["대화 워크플로우"]
-    RC["회상 서브워크플로우<br/>검색 → Planning"] -->|sufficient| RD["응답 판단"]
-    RC -->|insufficient| EXP["확장 검색"]
-    RC -->|needs_tool| TOOL["Tool Agent<br/>web_search · agent_work · MCP"]
-    EXP --> RD
-    TOOL --> RD
-    RD --> RT["응답 생성 (스트리밍)"]
-  end
-  subgraph SCH["스케줄러"]
-    PRO["선제 판단"]
-    REM["리마인더"]
-    WLD["세계"]
-  end
-  CH --> CORE["FastAPI 코어"]
-  CORE --> CONV
-  SCH --> CONV
-  RT -. 비동기 .-> POST["기억 기록 · 상태 갱신 · 약속 추출"]
-  POST --> NEO[("Neo4j 장기기억")]
+  CH["웹 · 데스크탑 · Android · Telegram"] --> CORE["FastAPI 코어"]
+  CORE --> RECALL["기억 검색"]
+  RECALL --> PLAN["계획 판단"]
+  PLAN -->|도구 필요| TOOL["검증된 도구 실행"]
+  TOOL --> PLAN
+  PLAN -->|답변 가능| DECIDE["상태·리마인더 판단"]
+  DECIDE --> TEXT["응답 스트리밍"]
+  TOOL --> EXT["웹 검색 · 메모 · CLI 위임"]
+  TOOL --> JOB["전문 리서치·경력 분석 접수"]
+  JOB -. 완료 후 별도 전달 .-> CORE
+  WORLD["가상 세계 · 선제대화 · 리마인더"] --> RECALL
+  DECIDE -. 일부 판단 .-> JEV["경량 판단 모델"]
+  TEXT -. 전달 후 .-> POST["기억 기록 · 상태 갱신 · 약속 추출"]
+  TEXT -. 모습·사진 행동 .-> IMG["ComfyUI 이미지 생성"]
+  POST --> NEO[("Neo4j 기억")]
   POST --> PG[("PostgreSQL 대화·상태")]
-  RD --> IMG["ComfyUI 이미지 생성"]
-  TOOL --> CLI["Codex / Claude CLI"]
-  RD -. 판단 .- JEV["Jev decision 모델"]
-  TOOL -->|MCP| AG["투자 비서 · 포트폴리오 Agent"]
+  RECALL --> NEO
+  REFLECT["일일 회고"] --> NEO
+  NEO --> REFLECT
 ```
 
 ## Challenges
 
-1. **토큰 스트리밍과 structured output의 충돌**
-   - 문제: 구조화 출력은 생성 도중 불완전한 JSON 조각이 나와 실시간 스트리밍을 할 수 없었습니다.
-   - 해결: 판단은 structured output 노드가, 응답 텍스트는 스트리밍 전용 노드가 맡도록 역할을 나눴습니다.
+1. **기억의 누적과 근거 추적**
+   - 원본 관측을 보존하면서 요약 기억 계층을 추가했습니다. 회고의 근거 ID와 실행 체크포인트를 남겨 검색과 중단 후 복구에 활용합니다.
 2. **선제 메시지와 사용자 메시지의 경합**
-   - 문제: 먼저 말을 거는 메시지를 만드는 사이에 사용자가 말을 걸면 맥락이 어긋난 메시지가 전송됐습니다.
-   - 해결: 스케줄러 간 틱 잠금, 수신 활동 번호, 생성 후와 전송 직전의 재검증으로 낡은 메시지 전송을 막았습니다.
-3. **쌓이기만 하는 기억**
-   - 문제: append-only 관측이 늘수록 회상 품질과 비용이 나빠졌습니다.
-   - 해결: 원본은 보존하고, 근거 ID로 연결된 일일 회고 Memory 계층을 더해 Memory 중심으로 회상합니다.
-4. **판단 노드의 LLM 비용과 지연**
-   - 문제: 여러 판단 노드가 매 턴 LLM을 호출했는데, 대부분 결과가 「변경 없음」이었습니다.
-   - 해결: Jev 게이트와 캐스케이드를 도입하고, 섀도 모드로 실데이터 일치율을 측정한 뒤 노드별로 승격했습니다.
-5. **제한된 GPU에서의 이미지 품질과 지연**
-   - 문제: 12GB GPU에서 대화 중에 이미지를 생성해야 했습니다.
-   - 해결: v1을 Base + LoRA로 최소화하고, 얼굴·손만 검출 디테일러로 보정했습니다. 전송은 비동기·저빈도로 설계했습니다.
+   - 생성 중 대화가 달라지면 낡은 메시지를 보낼 수 있습니다. 틱 잠금, 수신 활동 번호, 전송 직전 재검증을 결합했습니다.
+3. **가상 장면과 비동기 결과의 불일치**
+   - 이미지 생성 중 위치나 의상이 바뀔 수 있습니다. 장면 스냅샷과 revision으로 작업을 묶고 오래된 장면의 실행·전송을 제어합니다.
+4. **여러 판단 단계의 비용과 지연**
+   - 변경이 필요 없는 턴에도 생성 모델이 호출되는 문제에 경량 모델 게이트를 적용했습니다. 노드별 섀도 비교·폴백으로 적용 범위를 조절합니다.
+5. **응답 스트리밍과 실행 결정의 분리**
+   - 판단은 구조화 출력으로 처리하고 응답은 텍스트로 스트리밍합니다. 사진 생성은 완성된 최종 응답이 전달된 뒤 실행하여 미완성 출력의 부작용을 막습니다.
 
 ## Tech Stack
 
 | 영역 | 기술 |
 |---|---|
-| AI | Google ADK, Gemini 외 LLM(OpenRouter), Jev, ComfyUI(Base + LoRA) |
-| Backend | Python, FastAPI, Tavily, Codex/Claude CLI |
+| AI | Google ADK, Gemini·OpenRouter, Jev, ComfyUI·LoRA |
+| Backend | Python, FastAPI, Tavily, Codex/Claude CLI, MCP |
 | Data | Neo4j, PostgreSQL |
-| Client | Vite + TypeScript + PixiJS(Live2D), Tauri, Android, Telegram Bot |
+| Client | TypeScript·Vite·PixiJS(Live2D), Tauri, Android, Telegram Bot |

@@ -67,7 +67,7 @@
 <header>
   <div>
     <h1>AI 컴패니언 Agent</h1>
-    <div class="notice">더미 데이터로 재현한 프로토타입입니다 · 실제 API를 호출하지 않습니다</div>
+    <div class="notice">더미 데이터로 재현한 프로토타입입니다 · 실제 API를 호출하지 않습니다 · 시각·점수는 예시입니다</div>
   </div>
   <button id="reset" type="button">처음부터</button>
 </header>
@@ -112,7 +112,7 @@
   const STREAM_CHUNK = 2;
   const STREAM_TICK = 35;
   const EMOTIONS = { neutral: '평온', happy: '기쁨', sad: '슬픔', surprised: '놀람', annoyed: '언짢음' };
-  const INITIAL = { emotion: 'neutral', affection: 58, thought: '오늘은 조용한 하루네.', clock: '10/05 (일) 19:20' };
+  const INITIAL = { emotion: 'neutral', affection: 58, thought: '오늘은 조용한 하루네.', clock: '11/03 (화) 19:20' };
 
   const SCENARIOS = [
     {
@@ -121,35 +121,35 @@
       events: [
         { type: 'user', text: '지난번에 말한 라멘집 이름이 뭐였지?', delay: 100 },
         { type: 'flow', text: '생각 중...', delay: 300 },
-        { type: 'log', node: 'RetrieveMemoryNode', text: '장기기억 하이브리드 검색 (벡터 + BM25 → RRF)', delay: 700 },
+        { type: 'log', node: '기억 검색', text: '장기기억 하이브리드 검색 (벡터 + BM25 → RRF)', delay: 700 },
         { type: 'recall', delay: 600, items: [
           { text: '사용자는 회사 근처 「멘야 하루」의 돈코츠 라멘을 좋아한다', meta: 'Memory · 2주 전 대화 · 근거 3건' },
           { text: '사용자는 매운 음식보다 진한 국물을 선호한다', meta: 'Observation · likes' },
         ] },
-        { type: 'log', node: 'PlanningNode', text: '회상한 기억으로 답변 가능 → sufficient', badge: { kind: 'jev', text: 'Jev ✓ 0.97' }, delay: 800 },
-        { type: 'log', node: 'ResponseDecisionNode', text: '이미지 불필요 · 리마인더 없음', badge: { kind: 'jev', text: 'Jev ✓ 0.94' }, delay: 600 },
+        { type: 'log', node: '계획 판단', text: '검색 근거가 충분함 → 답변 생성', badge: { kind: 'llm', text: 'LLM' }, delay: 800 },
+        { type: 'log', node: '상태·리마인더 판단', text: '의상·장소 변경 없음 · 리마인더 없음', badge: { kind: 'jev', text: 'Jev ✓ 0.94' }, delay: 600 },
         { type: 'flow', text: '응답 보내는 중', delay: 300 },
         { type: 'assistant', text: '멘야 하루. 회사 근처 돈코츠 라멘집이라고 했잖아. 진한 국물 좋아한다더니, 또 가고 싶어진 거야?', delay: 300 },
         { type: 'flow', text: '대기 중', delay: 200 },
-        { type: 'log', node: 'UpdateStateNode', text: '상태 델타: 호감도 +2, 감정 → 기쁨', badge: { kind: 'llm', text: 'LLM' }, delay: 700 },
+        { type: 'log', node: '내적 상태 갱신', text: '상태 델타: 호감도 +2, 감정 → 기쁨', badge: { kind: 'llm', text: 'LLM' }, delay: 700 },
         { type: 'state', emotion: 'happy', affection: 60, thought: '좋아하는 걸 기억해 둔 게 통했네. 나도 라멘이 좀 궁금해졌어.', delay: 300 },
-        { type: 'log', node: 'ExtractCandidatesNode', text: '기억할 새 정보 없음 → 추출 생략', badge: { kind: 'jev', text: 'Jev 게이트 ✓ 0.91' }, delay: 600 },
+        { type: 'log', node: '기억 추출', text: '기억할 새 정보 없음 → 추출 생략', badge: { kind: 'jev', text: 'Jev 게이트 ✓ 0.91' }, delay: 600 },
       ],
     },
     {
       id: 'proactive',
       label: '⏩ 2시간 경과 (선제 메시지)',
       events: [
-        { type: 'jump', text: '⏩ 2시간 경과', clock: '10/05 (일) 21:20', delay: 100 },
-        { type: 'log', node: 'ProactiveScheduler', text: '선제대화 틱 · 마지막 대화로부터 2시간', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'jump', text: '⏩ 2시간 경과', clock: '11/03 (화) 21:20', delay: 100 },
+        { type: 'log', node: '선제대화 스케줄러', text: '선제대화 틱 · 마지막 대화로부터 2시간', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
         { type: 'flow', text: '생각 중...', delay: 200 },
         { type: 'recall', delay: 600, items: [
           { text: '사용자는 내일 오전 발표 자료를 준비하고 있다', meta: 'Memory · 오늘 오후 대화' },
           { text: '마지막 슬라이드 구성에서 막혀 있다고 했다', meta: 'Observation · experienced' },
         ] },
-        { type: 'log', node: 'EvaluateProactiveNode', text: '최근 기억·상태·세계 상태 검토 → 말을 걸기로 결정', badge: { kind: 'llm', text: 'LLM' }, delay: 900 },
-        { type: 'log', node: 'SelectDeliveryChannelNode', text: '웹 연결 없음 → 텔레그램', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
-        { type: 'log', node: 'MessageAgent', text: '선제 메시지 생성', badge: { kind: 'llm', text: 'LLM' }, delay: 600 },
+        { type: 'log', node: '선제대화 판단', text: '최근 기억·상태·세계 상태 검토 → 말을 걸기로 결정', badge: { kind: 'llm', text: 'LLM' }, delay: 900 },
+        { type: 'log', node: '전달 채널 선택', text: '웹 연결 없음 → 텔레그램', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'log', node: '선제 메시지 생성', text: '선제 메시지 생성', badge: { kind: 'llm', text: 'LLM' }, delay: 600 },
         { type: 'log', node: '전송 직전 재검증', text: '새 사용자 메시지 없음 · 상태 변화 없음 → 전송', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
         { type: 'flow', text: '응답 보내는 중', delay: 200 },
         { type: 'assistant', text: '발표 자료는 다 만들었어? 아까 마지막 슬라이드에서 막힌다고 했잖아. 아직이면 같이 보자.', channel: '텔레그램으로 전송', delay: 300 },
@@ -163,15 +163,16 @@
       events: [
         { type: 'user', text: '내일 아침 9시에 회의 있는 거 알려줘', delay: 100 },
         { type: 'flow', text: '생각 중...', delay: 300 },
-        { type: 'log', node: 'PlanningNode', text: '기억 검색 불필요 → sufficient', badge: { kind: 'jev', text: 'Jev ✓ 0.95' }, delay: 700 },
-        { type: 'log', node: 'ResponseDecisionNode', text: '리마인더 요청 감지 → LLM으로 세부 판단', badge: { kind: 'llm', text: 'Jev → LLM' }, delay: 700 },
+        { type: 'log', node: '기억 검색', text: '최근 대화와 관련 기억 확인', delay: 400 },
+        { type: 'log', node: '계획 판단', text: '추가 도구 없이 리마인더 요청 처리', badge: { kind: 'llm', text: 'LLM' }, delay: 700 },
+        { type: 'log', node: '상태·리마인더 판단', text: '리마인더 요청 감지 → LLM으로 시각·내용 판단', badge: { kind: 'llm', text: 'Jev → LLM' }, delay: 700 },
         { type: 'flow', text: '응답 보내는 중', delay: 200 },
         { type: 'assistant', text: '알았어. 내일 8시 50분에 말해 줄게. 너무 늦게 자지 마.', delay: 300 },
         { type: 'flow', text: '대기 중', delay: 200 },
-        { type: 'log', node: 'ExtractResponsePromisesNode', text: '응답 속 약속 추출: 내일 08:50 회의 알림', badge: { kind: 'llm', text: '정규식 ✓ → LLM' }, delay: 700 },
+        { type: 'log', node: '응답 속 약속 추출', text: '응답 속 약속 추출: 내일 08:50 회의 알림', badge: { kind: 'llm', text: '정규식 ✓ → LLM' }, delay: 700 },
         { type: 'reminder', text: '오전 9시 회의 알림', due: '내일 08:50', delay: 400 },
-        { type: 'jump', text: '⏩ 다음 날 08:50', clock: '10/06 (월) 08:50', delay: 1000 },
-        { type: 'log', node: 'ReminderScheduler', text: '기한 도래 · 이후 대화로 무효화되지 않음 → 발화', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
+        { type: 'jump', text: '⏩ 다음 날 08:50', clock: '11/04 (수) 08:50', delay: 1000 },
+        { type: 'log', node: '리마인더 스케줄러', text: '기한 도래 · 이후 대화로 무효화되지 않음 → 발화', badge: { kind: 'rule', text: '규칙' }, delay: 600 },
         { type: 'flow', text: '응답 보내는 중', delay: 200 },
         { type: 'assistant', text: '9시 회의 10분 전이야. 자료 챙겼지?', channel: '텔레그램으로 전송', delay: 300 },
         { type: 'reminderDone', delay: 300 },
@@ -180,16 +181,21 @@
     },
     {
       id: 'tool',
-      label: '🛠 Tool 위임',
+      label: '🛠 전문 리서치 위임',
       events: [
         { type: 'user', text: '이번 주 엔비디아 관련 이슈 정리해줘', delay: 100 },
         { type: 'flow', text: '생각 중...', delay: 300 },
-        { type: 'log', node: 'RetrieveMemoryNode', text: '관련 기억 없음', delay: 600 },
-        { type: 'log', node: 'PlanningNode', text: '투자 리서치 필요 → needs_tool', badge: { kind: 'jev', text: 'Jev ✓ 0.92' }, delay: 700 },
-        { type: 'tool', name: 'investment_agent', text: 'MCP · 투자 비서 Agent에 리서치 요청 → 뉴스 6건, 주가 흐름 요약', delay: 1100 },
-        { type: 'tool', name: 'agent_work', text: 'Codex CLI에 위임 · 받은 리서치를 이슈별로 묶어 요약', delay: 1200 },
-        { type: 'flow', text: '응답 보내는 중', delay: 400 },
-        { type: 'assistant', text: '이번 주 엔비디아 이슈는 세 갈래야.\n1. 실적 발표를 앞두고 데이터센터 매출 기대가 커졌어.\n2. 신규 GPU 출시 일정 얘기가 다시 나왔고.\n3. 수출 규제 관련 뉴스는 아직 결론이 없어.\n(데모용 예시 요약이야)', delay: 300 },
+        { type: 'log', node: '기억 검색', text: '관련 기억 없음', delay: 600 },
+        { type: 'log', node: '계획 판단', text: '외부 금융 근거 필요 → 전문 리서치 도구 선택', badge: { kind: 'llm', text: 'LLM' }, delay: 700 },
+        { type: 'tool', name: 'investment_agent', label: '투자 리서치', text: '스킬·읽기 MCP를 사용하는 전문 작업 접수 · 아직 결과 없음', delay: 1100 },
+        { type: 'log', node: '계획 판단', text: '접수 상태 확인 → 안내 응답 생성', badge: { kind: 'llm', text: 'LLM' }, delay: 500 },
+        { type: 'flow', text: '응답 보내는 중', delay: 300 },
+        { type: 'assistant', text: '투자 리서치를 맡겼어. 자료를 확인하고 나면 따로 알려줄게.', delay: 300 },
+        { type: 'flow', text: '대기 중', delay: 200 },
+        { type: 'jump', text: '⏩ 전문 리서치 완료 (예시)', clock: '11/03 (화) 19:23', delay: 1200 },
+        { type: 'log', node: '전문 작업', text: 'CLI가 금융 근거를 조회하고 보고서 저장 → 별도 결과 전달', badge: { kind: 'rule', text: '완료' }, delay: 500 },
+        { type: 'flow', text: '응답 보내는 중', delay: 300 },
+        { type: 'assistant', text: '이번 주 엔비디아 이슈는 세 갈래야.\n1. 실적 발표를 앞두고 데이터센터 매출 기대가 커졌어.\n2. 신규 GPU 출시 일정 얘기가 다시 나왔고.\n3. 수출 규제 관련 뉴스는 아직 결론이 없어.\n(데모용 예시 요약이야)', channel: '작업 완료 후 별도 전달', delay: 300 },
         { type: 'flow', text: '대기 중', delay: 200 },
       ],
     },
@@ -270,7 +276,7 @@
     tool: (ev) => {
       const card = el('div', 'tool-call');
       card.dataset.tool = ev.name;
-      card.appendChild(el('b', null, ev.name));
+      card.appendChild(el('b', null, ev.label || ev.name));
       card.appendChild(document.createTextNode(` ${ev.text}`));
       append(card);
     },

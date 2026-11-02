@@ -51,7 +51,7 @@ def test_companion_rendered_text_has_no_private_terms(page, base_url):
     page.goto(f"{base_url}/projects/ai-companion-agent/")
     text = page.locator(".project-content").inner_text()
     assert not pattern.search(text)
-    for keyword in ["Jev", "ComfyUI", "agent_work", "개인 비서", "MCP"]:
+    for keyword in ["Jev", "ComfyUI", "도구 실행", "개인 비서", "MCP"]:
         assert keyword in text
     for roadmap_word in ["로드맵", "최종 목표", "향후"]:
         assert roadmap_word not in text

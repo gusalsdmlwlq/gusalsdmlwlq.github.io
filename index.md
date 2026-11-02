@@ -212,39 +212,38 @@ title: Portfolio - Hyunmin Jeon
           <div class="role">AI 컴패니언 Agent</div>
         </div>
         <div class="pills">
-          <em>Generative Agent</em><em>Agentic Workflow</em><em>Google ADK</em><em>Long-term Memory</em><em>Knowledge Graph</em><em>MCP</em><em>Agent as Tool</em><em>Proactive Agent</em><em>Jev Hybrid Decision</em><em>ComfyUI</em>
+          <em>Generative Agent</em><em>Agentic Workflow</em><em>Google ADK</em><em>Long-term Memory</em><em>Knowledge Graph</em><em>MCP</em><em>Agent as Tool</em><em>Proactive Agent</em><em>Hybrid Decision</em><em>ComfyUI</em>
         </div>
         <ul class="list-tight">
-          <li>대화를 기억하고 먼저 말을 거는 AI 컴패니언 겸 개인 비서 Agent 개발
-              <ul>
-                  <li>캐릭터 페르소나 기반 대화와 영속적 내적 상태(감정, 호감도, 생각)</li>
-                  <li>백그라운드 세계 시뮬레이션과 선제적 대화, 대화 속 약속 기반 리마인더</li>
-              </ul>
+          <li>대화를 기억하고 먼저 말을 거는 개인 비서 Agent
+            <ul>
+              <li>캐릭터 페르소나와 영속적인 감정·관계 상태 관리</li>
+              <li>독립적인 사용자·캐릭터 위치와 가상 세계, 선제적 대화·리마인더</li>
+            </ul>
           </li>
           <li>Knowledge Graph 기반 장기기억
-              <ul>
-                  <li>LLM으로 대화에서 관측을 추출해 Knowledge Graph 자동 구축</li>
-                  <li>벡터 + BM25 RRF 하이브리드 검색으로 기억 회상</li>
-                  <li>일일 회고로 관측을 Memory로 요약</li>
-              </ul>
+            <ul>
+              <li>대화에서 관측 사실을 추출하고 원본 근거를 보존</li>
+              <li>하이브리드 검색과 일일 회고로 경험을 회상</li>
+            </ul>
           </li>
-          <li>Tool 기반 개인 비서 기능
-              <ul>
-                  <li>웹 검색 및 Codex / Claude CLI 작업 위임</li>
-                  <li>MCP로 투자 비서 Agent, 포트폴리오 Agent를 Tool로 호출</li>
-              </ul>
+          <li>도구 실행과 전문 Agent 연동
+            <ul>
+              <li>계획 판단과 도구 실행을 반복하며 웹 검색·메모·CLI 위임 수행</li>
+              <li>MCP 기반 투자 리서치·경력 분석을 접수하고 완료 후 별도 전달</li>
+            </ul>
           </li>
-          <li>경량 decision 모델 기반 LLM 판단 효율화
-              <ul>
-                  <li>Jev 하이브리드 판단(게이트 / 캐스케이드)으로 불필요한 LLM 호출 절감</li>
-                  <li>섀도 모드로 실데이터 일치율을 측정한 뒤 노드별로 단계적 적용</li>
-              </ul>
+          <li>경량 모델 기반 LLM 판단 효율화
+            <ul>
+              <li>경량 판단 모델(Jev)로 호출 필요 여부를 먼저 판단</li>
+              <li>섀도 비교와 신뢰도 기반 채택·폴백을 노드별 적용</li>
+            </ul>
           </li>
-          <li>멀티모달 · 멀티 채널 인터페이스
-              <ul>
-                  <li>로컬 ComfyUI 연동 이미지 생성 파이프라인 (Base + LoRA, 얼굴·손 디테일러)</li>
-                  <li>웹(Live2D) / 텔레그램 / 데스크탑(Tauri) / Android가 하나의 대화 세션 공유</li>
-              </ul>
+          <li>멀티모달·멀티 채널 인터페이스
+            <ul>
+              <li>대화의 모습·사진 공유 행동과 ComfyUI 이미지 생성 연결</li>
+              <li>웹(Live2D), Telegram, Tauri 데스크탑·Android에서 동일 대화 세션 공유</li>
+            </ul>
           </li>
         </ul>
         <div class="project-actions">
@@ -257,33 +256,37 @@ title: Portfolio - Hyunmin Jeon
           <div class="role">투자 비서 Agent</div>
         </div>
         <div class="pills">
-          <em>Multi-Agent Orchestration</em><em>Dynamic Planning</em><em>Graph RAG</em><em>Knowledge Graph</em><em>Hybrid Search (RRF)</em><em>WebSocket Streaming</em><em>Elasticsearch</em><em>Neo4j</em><em>InfluxDB</em><em>Flutter</em>
+          <em>Multi-Agent Orchestration</em><em>Dynamic Planning</em><em>Graph RAG</em><em>Financial Knowledge Graph</em><em>Hybrid Search (RRF)</em><em>MCP</em><em>Scheduled Briefing</em><em>Multi-Agent Debate</em><em>PostgreSQL</em><em>Flutter</em>
         </div>
         <ul class="list-tight">
-          <li>Multi-Agent 기반 주식 투자 비서 서비스 개발
-              <ul>
-                  <li>동적 Planning을 통한 Multi-Agent Orchestration</li>
-                  <li>데이터 수집, 분석, 시각화 등</li>
-              </ul>
-          </li>
-          <li>경제 데이터 분석 인사이트 및 경제 지식 제공
-              <ul>
-                  <li>주식 및 경제 지표 API 연동</li>
-                  <li>뉴스 데이터 수집 및 RRF 검색</li>
-                  <li>웹 검색 API 연동</li>
-              </ul>
-          </li>
-          <li>Knowledge Graph 기반 RAG
+          <li>Multi-Agent 기반 금융 리서치
             <ul>
-              <li>LLM으로 주식 및 경제 관련 데이터 기반 Knowledge Graph 구축</li>
-              <li>Knowledge Graph를 연동하여 Graph RAG 구현</li>
+              <li>질문에 따라 검색·수집·분석·시각화 Agent를 동적으로 조율</li>
+              <li>주가·경제 지표·뉴스 근거를 연결한 답변 스트리밍</li>
             </ul>
           </li>
-          <li>Flutter로 웹 / 모바일 앱 구현
+          <li>시점별 금융 사실을 관리하는 Knowledge Graph
             <ul>
-              <li>GCP Cloud Run으로 웹 서비스 배포</li>
-              <li>GCP VM으로 Nginx & FastAPI 서버 배포</li>
-              <li>웹 소켓 통신으로 답변 스트리밍</li>
+              <li>기업·지표·투자 테마와 실적·가이던스·거래 관계 구조화</li>
+              <li>읽기 전용 질의 템플릿으로 필요한 사실·수치·시점을 검색</li>
+            </ul>
+          </li>
+          <li>정기 브리핑과 근거 기반 투자 토론
+            <ul>
+              <li>경제·AI 테크 일간 브리핑과 주간 시장 분석</li>
+              <li>네 관점의 2라운드 토론에서 주장·반론·근거를 연결</li>
+            </ul>
+          </li>
+          <li>개인 종목 분석과 시장 현황
+            <ul>
+              <li>보유·관심 종목의 일간 주요 발견과 주간 가설·연결 분석</li>
+              <li>가격·금리·변동성 스냅샷과 비교 기준을 함께 조회</li>
+            </ul>
+          </li>
+          <li>Flutter 앱과 MCP 기반 조회
+            <ul>
+              <li>웹·모바일에서 채팅·브리핑·토론·개인 포트폴리오 조회</li>
+              <li>Claude Code·Codex에서 금융 근거 조회와 심층 분석에 활용</li>
             </ul>
           </li>
         </ul>
@@ -297,20 +300,38 @@ title: Portfolio - Hyunmin Jeon
           <div class="role">포트폴리오 Agent</div>
         </div>
         <div class="pills">
-          <em>Graph RAG</em><em>Agentic RAG</em><em>Knowledge Graph</em><em>Google ADK</em><em>Leiden Community Detection</em><em>Personalized PageRank</em><em>Hybrid Search (RRF)</em><em>Neo4j</em><em>MCP</em><em>GitHub Pages</em>
+          <em>Graph RAG</em><em>Agentic RAG</em><em>Knowledge Graph</em><em>Google ADK</em><em>Leiden Community Detection</em><em>Personalized PageRank</em><em>Hybrid Search (RRF)</em><em>MCP</em><em>Career Briefing</em><em>Data Collection</em>
         </div>
         <ul class="list-tight">
-          <li>이력/경력 사항 및 업무/프로젝트 경험을 관리하기 위한 Graph RAG Agent 서비스 개발
-              <ul>
-                  <li>텍스트 형태로 데이터를 입력하면 자동으로 Knowledge Graph로 빌드</li>
-                  <li>Knowledge Graph 기반으로 이력/경력 및 업무/프로젝트 관련 질의응답</li>
-              </ul>
+          <li>경력·프로젝트 경험 기반 Graph RAG
+            <ul>
+              <li>문서에서 엔티티·관계를 추출하고 원본 근거와 연결</li>
+              <li>하이브리드 검색·그래프 확장·커뮤니티 요약으로 질문에 답변</li>
+            </ul>
           </li>
-          <li>Github Page 기반의 웹 포트폴리오 페이지에 Graph RAG 기반 질의응답 기능을 챗봇 형태로 연동
-              <ul>
-                  <li>GCP VM으로 Nginx & FastAPI 서버 배포</li>
-                  <li>Github Page에서 이벤트 스트리밍 기반 통신</li>
-              </ul>
+          <li>MCP 기반 경력 분석
+            <ul>
+              <li>Claude Code·Codex에서 사실 조회와 심층 분석 지원</li>
+              <li>이력서 작성·경력 강점과 공백·채용 요건 적합성 분석에 활용</li>
+            </ul>
+          </li>
+          <li>채용공고·기술 동향 수집 파이프라인
+            <ul>
+              <li>공고 정규화와 신규·변경·마감 이력 추적</li>
+              <li>공개 기술 자료의 선별·정제·중복 통합과 출처 보존</li>
+            </ul>
+          </li>
+          <li>개인 경력과 연결한 일간 브리핑
+            <ul>
+              <li>이전 발행 이후의 채용·기술 변화와 요구 역량 정리</li>
+              <li>경력과의 연결, 확인할 기회와 다음 행동 제시</li>
+            </ul>
+          </li>
+          <li>공개 챗봇과 관리자 조회
+            <ul>
+              <li>GitHub Pages에 SSE 기반 질의응답 챗봇 연동</li>
+              <li>Google 로그인 관리자 웹에서 브리핑·공고·기술 동향·수집 현황 조회</li>
+            </ul>
           </li>
         </ul>
         <div class="project-actions">

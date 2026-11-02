@@ -1,9 +1,9 @@
 ---
 layout: project
 title: 포트폴리오 Agent
-subtitle: 이력·경력 텍스트를 Knowledge Graph로 자동 구축하고, Graph RAG로 질의응답하는 포트폴리오 Agent
-description: 이력·경력 텍스트를 Knowledge Graph로 자동 구축하고, Graph RAG로 질의응답하는 포트폴리오 Agent
-tags: [Graph RAG, Agentic RAG, Knowledge Graph, Google ADK, Leiden Community Detection, Personalized PageRank, Hybrid Search (RRF), Neo4j, MCP, GitHub Pages]
+subtitle: 경력 지식 검색과 채용·기술 동향 수집을 연결해 질의응답, 경력 분석과 일간 브리핑을 제공하는 Agent
+description: 경력 지식 검색과 채용·기술 동향 수집을 연결해 질의응답, 경력 분석과 일간 브리핑을 제공하는 Agent
+tags: [Graph RAG, Agentic RAG, Knowledge Graph, Google ADK, Leiden Community Detection, Personalized PageRank, Hybrid Search (RRF), MCP, Career Briefing, Data Collection]
 demo:
   type: live-chatbot
   questions:
@@ -14,7 +14,9 @@ demo:
 
 ## Overview
 
-이력과 프로젝트 경험을 텍스트로 입력하면 LLM이 엔티티와 관계를 추출해 Knowledge Graph로 쌓습니다. 질문이 들어오면 질문 유형에 맞는 검색 경로로 근거를 모아 답변합니다. **지금 이 페이지 오른쪽 아래의 챗봇이 바로 이 시스템입니다.**
+이력과 프로젝트 경험을 Knowledge Graph로 관리하고, 질문에 맞는 근거를 찾아 답변하는 포트폴리오 Agent입니다. **이 페이지 오른쪽 아래 챗봇이 실제 서비스에 연결되어 있습니다.** MCP와 스킬을 통해 경력 분석, 이력서 작성과 채용 요건 적합성 분석에도 활용합니다.
+
+채용공고·기술 동향을 독립 수집기로 수집하고, 개인 경력과 연결한 일간 커리어 브리핑을 제공합니다. 관리자 웹에서는 브리핑, 공고, 기술 동향과 수집 현황을 함께 조회합니다.
 
 ## Demo
 
@@ -22,83 +24,80 @@ demo:
 
 ## Key Features
 
-### 1. Ingestion 워크플로우 (Google ADK 그래프)
-- 엔티티 추출 → 기존 엔티티가 있으면 병합 → 저장 → 관계 추출 → 저장 순서의 그래프 워크플로우입니다.
-- 엔티티 7종(Project, Technology, Company, Role, Achievement, Topic, Challenge)과 관계 7종으로 스키마를 고정해 추출 결과를 일관되게 유지합니다.
-- 모든 LLM 노드는 Pydantic structured output을 사용합니다.
+### 1. 경력 문서의 KG 구축
+- 엔티티 추출 → 기존 설명 병합 → 저장 → 관계 추출·저장의 Google ADK 워크플로우를 구성했습니다.
+- 프로젝트·기술·회사·역할·성과·주제·문제 경험을 정해진 스키마로 추출합니다. 엔티티·관계 추출에는 Pydantic 구조화 출력을 적용합니다.
+- 원본 문서와 추출된 엔티티를 연결하고, 같은 타입·이름의 엔티티 설명을 병합하여 추가 경험을 보강합니다.
 
-### 2. RAG 워크플로우
-- **Query Analyzer**가 질문을 분석해 라우팅합니다.
-  - 잡담(chitchat) → 바로 답변
-  - 넓은 질문(broad) → 커뮤니티 검색 → Retriever
-  - 그 외 → Retriever
-- **Planner**가 모은 근거가 충분한지 판단하고, 부족하면 Retriever를 다시 실행합니다(최대 3회).
+### 2. 질문 유형과 그래프 구조에 맞춘 검색
+- 질문을 분석해 잡담, 전체 경력처럼 넓은 질문, 구체적인 사실 질문의 검색 경로를 나눕니다.
+- 엔티티 벡터·전문 검색을 RRF로 결합하고 관계 요약 검색과 Personalized PageRank 기반 확장을 적용합니다.
+- Leiden 계층 커뮤니티와 LLM 요약으로 넓은 질문의 진입점을 찾습니다. 이후 근거 충분성을 판단해 최대 3회 검색 루프 안에서 보완합니다.
+- PostgreSQL 대화 세션과 이전 턴의 질문 분석 정보를 유지하여 후속 질문의 맥락을 연결합니다.
 
-### 3. 검색
-- 벡터 + 전문 검색 하이브리드를 RRF로 결합합니다.
-- PPR(Personalized PageRank)로 관련 엔티티를 확장합니다.
-- Leiden 알고리즘으로 2레벨 계층 커뮤니티를 만들고, LLM이 커뮤니티마다 이름과 요약을 붙입니다.
+### 3. MCP 기반 경력 분석과 접근 제어
+- Claude Code·Codex에서 사실 조회 스킬과 심층 분석 스킬을 사용할 수 있도록 MCP를 제공합니다.
+- 경력·프로젝트 원문 근거를 모아 이력서 작성, 강점·공백 분석, 채용 요건과의 비교에 활용합니다.
+- 공개·비공개 데이터 검색 범위와 관리자 전용 분석 모드를 구분합니다. 공개 챗봇과 관리 API의 접근 경로도 분리합니다.
 
-### 4. 멀티턴 대화
-- ADK 세션(PostgreSQL)과 대화 히스토리를 유지하고, 이전 턴의 질문 분석 결과를 다음 턴에 주입합니다.
+### 4. 채용·기술 동향 수집과 일간 브리핑
+- 채용공고 수집기는 공고를 정규화하고 신규·변경·마감 이력을 추적합니다. 공백·목록 순서 같은 표현 차이로 발생하는 불필요한 변경을 억제합니다.
+- 기술 동향 수집기는 공개 소스와 웹 검색에서 후보를 찾고 LLM으로 선별·정제합니다. 같은 발표를 가리키는 중복 후보를 통합하고 출처를 보존합니다.
+- 수집기는 독립 실행하고 공개 조회용 DB 뷰로 브리핑·조회 서비스와 연결합니다.
+- Codex 기반 예약 워커가 이전 발행 이후의 주요 변화, 요구 기술, 개인 경력과의 연결과 다음 행동을 정리합니다. 기술 발견 자료는 조사 후보로 사용하고 원문을 다시 확인하도록 구성합니다.
 
-### 5. 접근 제어와 모드
-- 데이터마다 public/private visibility를 두고, admin 토큰이 있을 때만 private 데이터까지 검색합니다.
-- 사실 기반 Q&A(qa)와 심층 분석(analyst, admin 전용) 모드를 제공합니다.
-
-### 6. 연동과 운영
-- GitHub Pages 포트폴리오에 SSE 스트리밍 챗봇 위젯으로 연동했습니다.
-- MCP 서버로 Claude Code 스킬에서 포트폴리오를 조회합니다.
-- GCP VM에 nginx + oauth2-proxy로 배포하고, OpenTelemetry → Jaeger로 워크플로우를 트레이싱합니다.
+### 5. 관리자 조회와 운영 관측
+- Google 로그인 기반 웹에서 브리핑·채용공고·기술 동향·수집 현황을 검색하고 상세 내용을 조회합니다.
+- 핵심 요약과 출처를 먼저 보여주고 수집·진단 정보는 펼쳐 보도록 구성했습니다. 긴 목록과 본문을 각각 스크롤할 수 있습니다.
+- 검색 후보의 실제 선택은 Gemini 결과를 유지하면서 경량 판단 모델(Jev)을 백그라운드에서 비교하는 섀도 평가를 구현했습니다.
+- 생성·임베딩 호출의 토큰과 추정 비용을 PostgreSQL에 저장하여 모델·처리 단계별로 조회합니다.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  subgraph ING["Ingestion"]
-    T["이력·프로젝트 텍스트"] --> EX["Entity Extractor"]
-    EX -->|기존 엔티티 존재| MG["Merge"]
-    EX -->|신규만| ESN["Entity Store"]
-    MG --> ESN
-    ESN --> RX["Relationship Extractor"]
-    RX --> RS["Relationship Store"]
-  end
-  subgraph QRY["Query"]
-    W["GitHub Pages 챗봇"] --> NG["nginx"]
-    NG --> API["FastAPI"]
-    MCP["MCP · Claude Code 스킬"] --> API
-    API --> QA["Query Analyzer"]
-    QA -->|chitchat| ANS["Answer"]
-    QA -->|broad| CS["Community Search"]
-    QA -->|default| RT["Retriever"]
-    CS --> RT
-    RT --> PL["Planner"]
-    PL -->|insufficient| RT
-    PL -->|sufficient| ANS
-  end
-  RS --> NEO[("Neo4j")]
-  RT --> NEO
-  API --> PG[("PostgreSQL")]
+  DOC["경력·프로젝트 문서"] --> ING["엔티티 추출·병합 · 관계 추출"]
+  ING --> KG[("Neo4j 경력 KG")]
+  WEB["공개 포트폴리오 챗봇"] --> API["FastAPI · 접근 제어"]
+  MCP["Claude Code · Codex MCP"] --> API
+  API --> QA["질문 분석"]
+  QA -->|넓은 질문| COMMUNITY["커뮤니티 검색"]
+  QA -->|구체적인 질문| RETRIEVE["하이브리드 검색 · 그래프 확장"]
+  QA -->|잡담| ANSWER["응답 스트리밍"]
+  COMMUNITY --> RETRIEVE
+  RETRIEVE --> KG
+  RETRIEVE --> PLAN["근거 충분성 판단"]
+  PLAN -->|보완 검색| RETRIEVE
+  PLAN -->|답변 가능| ANSWER
+  JOBS["채용공고 수집기"] --> DATA[("PostgreSQL 수집 데이터")]
+  TECH["기술 동향 수집기"] --> DATA
+  DATA --> BRIEF["일간 커리어 브리핑"]
+  KG -->|경력 근거| BRIEF
+  BRIEF --> REPORT[("발행본 · 출처 · 실행 기록")]
+  ADMIN["Google 로그인 관리자 웹"] --> API
+  API --> DATA
+  API --> REPORT
 ```
 
 ## Challenges
 
-1. **넓은 질문 검색**
-   - 문제: 「어떤 프로젝트를 했어?」처럼 특정 엔티티가 없는 질문은 엔티티 유사도 검색으로는 전체를 커버하지 못했습니다.
-   - 해결: Leiden 계층 커뮤니티와 LLM 커뮤니티 요약을 만들고, Query Analyzer가 broad 질문을 커뮤니티 검색으로 라우팅하도록 했습니다.
+1. **넓은 질문의 검색 범위**
+   - 특정 프로젝트명을 포함하지 않는 질문에는 엔티티 유사도만으로 근거를 모으기 어렵습니다. 계층 커뮤니티와 요약을 검색 진입점으로 사용했습니다.
 2. **한 번의 검색으로 부족한 근거**
-   - 문제: 여러 홉을 거쳐야 하는 질문은 1회 검색으로 근거가 모자랐습니다.
-   - 해결: Planner가 근거 충분성을 판단해 Retriever를 반복 실행하는 루프를 만들고, 상한(3회)을 둬 지연을 제어했습니다.
-3. **공개 챗봇과 관리 기능의 분리**
-   - 문제: 같은 API를 공개 위젯과 관리자 도구(MCP, 인제스트)가 함께 사용합니다.
-   - 해결: nginx 경로 화이트리스트, Bearer 토큰 기반 visibility 필터, admin 전용 analyst 모드로 공개 범위와 권한을 나눴습니다.
+   - 관계 요약 검색과 그래프 확장을 결합하고, 계획 단계에서 근거를 평가해 제한된 횟수 안에서 추가 검색합니다.
+3. **수집량과 읽을 가치의 차이**
+   - 표현만 달라진 공고와 같은 발표의 중복 기술 후보를 줄였습니다. 브리핑은 수집 목록 나열보다 이전 발행 이후의 변화와 필요한 행동을 중심으로 작성합니다.
+4. **발행 시점의 근거와 장애 복구**
+   - 조사 시점까지 확보된 입력과 출처를 보존하고, 검증된 산출물을 복구에 재사용해 나중에 수집된 내용이 과거 회차에 섞이지 않도록 합니다.
+5. **공개 서비스와 개인 분석의 분리**
+   - 공개 챗봇, 관리자 웹, MCP별 인증과 조회 범위를 나누고 DB 연결 정보와 관리자 비밀키를 브라우저에 전달하지 않습니다.
 
 ## Tech Stack
 
 | 영역 | 기술 |
 |---|---|
-| AI | Google ADK, Gemini, Graph RAG, Leiden, PPR |
+| AI | Google ADK, Gemini, Codex, Graph RAG, Leiden, PPR, Jev 섀도 평가 |
 | Backend | Python, FastAPI, FastMCP |
 | Data | Neo4j, PostgreSQL |
-| Infra | GCP VM, Docker Compose, nginx, oauth2-proxy, OpenTelemetry, Jaeger |
-| Frontend | GitHub Pages(Jekyll), SSE 챗봇 위젯 |
+| Infra | GCP VM, Docker Compose, Cloud Build, nginx, oauth2-proxy |
+| Frontend | GitHub Pages(Jekyll), SSE 챗봇 위젯, 관리자 웹 |

@@ -1,9 +1,9 @@
 ---
 layout: project
 title: 투자 비서 Agent
-subtitle: 질문에 맞춰 전문 에이전트들을 동적으로 조율해 경제 데이터를 수집·분석·시각화하는 리서치 채팅 Agent
-description: 질문에 맞춰 전문 에이전트들을 동적으로 조율해 경제 데이터를 수집·분석·시각화하는 리서치 채팅 Agent
-tags: [Multi-Agent Orchestration, Dynamic Planning, Graph RAG, Knowledge Graph, Hybrid Search (RRF), WebSocket Streaming, Elasticsearch, Neo4j, InfluxDB, Flutter]
+subtitle: 금융 지식과 뉴스를 연결해 리서치, 정기 브리핑, 투자 토론과 개인 종목 분석을 제공하는 Agent
+description: 금융 지식과 뉴스를 연결해 리서치, 정기 브리핑, 투자 토론과 개인 종목 분석을 제공하는 Agent
+tags: [Multi-Agent Orchestration, Dynamic Planning, Graph RAG, Financial Knowledge Graph, Hybrid Search (RRF), MCP, Scheduled Briefing, Multi-Agent Debate, PostgreSQL, Flutter]
 demo:
   type: prototype
   src: /demos/investment-agent/
@@ -12,103 +12,99 @@ demo:
 
 ## Overview
 
-주식·경제 관련 질문을 받으면 Manager 에이전트가 필요한 정보를 먼저 정리하고 계획을 세웁니다. 이후 웹 검색, 데이터 수집, 분석, 시각화 에이전트에게 단계별로 작업을 위임하고, 결과를 종합해 차트와 출처를 포함한 리서치 답변을 스트리밍합니다. Flutter 웹/모바일 앱의 리서치 채팅이 진입점입니다.
+주식·경제 질문에 맞춰 검색·데이터 수집·분석·시각화 Agent를 조율하는 투자 비서입니다. 뉴스와 금융 Knowledge Graph, 주가·경제 지표를 근거로 리서치 답변을 생성합니다.
+
+질의응답에 더해 경제·AI 테크 정기 브리핑, 네 관점의 투자 토론, 보유·관심 종목의 일간·주간 분석을 구현했습니다. Flutter 앱에서 채팅, 발행본, 개인 포트폴리오와 시장 현황을 조회하고, Claude Code·Codex에서도 MCP를 통해 저장된 근거를 활용합니다.
 
 ## Demo
 
 <div id="demo-slot"></div>
 
+위 프로토타입은 리서치 채팅의 검색·분석·시각화 과정을 보여줍니다. 브리핑·토론·개인 종목 분석은 아래 구현 설명에 포함합니다.
+
 ## Key Features
 
-### 1. Orchestrator 기반 동적 위임
-WebSocket `/chat-stream`으로 들어온 질문을 Manager가 다음 순서로 처리합니다.
-- **Facts Survey**: 질문에 이미 주어진 사실, 찾아야 할 사실, 추론할 사실을 정리합니다.
-- **Plan**: 팀 구성을 바탕으로 초기 계획을 세웁니다.
-- **Progress Ledger 루프**: 매 단계 structured output으로 목표 달성 여부, 답변 가능 여부, 진행·반복 여부, 다음 담당 에이전트와 지시를 판단합니다. 진행이 없거나 같은 단계가 반복되면 stall 카운트를 올리고, 상한(3)에 도달하면 루프를 끝냅니다.
-- **의존성 검사**: 에이전트마다 선행 에이전트를 선언합니다(예: Analyst는 DataCollector 또는 WebSearcher, Visualizer는 DataCollector). 조건을 충족하지 못하면 위임하지 않고 Manager에게 다시 판단하게 합니다.
-- **Final Answer**: 분석 결과와 시각화 메타데이터를 바탕으로 최종 답변을 생성합니다.
+### 1. 질문에 따른 동적 Agent 조율
+- 질문에 주어진 사실과 추가로 조사할 사실을 구분하고 초기 계획을 세웁니다.
+- 매 단계 진행 상황·답변 가능 여부·반복 여부를 판단해 다음 Agent에 작업을 위임합니다. 반복 상한과 선행 작업 의존성을 검사합니다.
+- 웹 검색, 주가·뉴스 수집, 지식 조회, 분석, 차트 생성을 조합하고 출처와 함께 답변을 스트리밍합니다.
+- 대화 세션과 메시지·차트를 저장하여 후속 질문과 과거 리서치 조회에 활용합니다.
 
-### 2. 전문 에이전트
+### 2. 금융 사실의 시점과 관계를 보존하는 KG
+- 회사·지표 등 고유 엔티티와 실적·가이던스 등 시점별 사실을 분리하고 수치·단위·대상 기간을 구조화합니다.
+- 기업 거래, 공급·경쟁 관계, 지수·ETF·투자 테마, 실적·경제 일정을 연결합니다. 거시지표와 시세 시계열은 InfluxDB에서 함께 조회합니다.
+- LLM이 검증된 읽기 전용 Cypher 템플릿과 인자를 선택합니다. 이름·별칭을 해석하고 질문에 필요한 사실을 짧은 근거 문장으로 반환합니다.
+- 동일한 질문 세트로 뉴스 검색 단독, KG 확장, 템플릿 검색을 비교하여 사실 재현율과 컨텍스트 크기를 평가합니다.
 
-| 에이전트 | 역할 |
-|---|---|
-| WebSearcher | Tavily 웹·뉴스 검색 |
-| DataCollector | yfinance 주가·종목 뉴스, Elasticsearch 뉴스 하이브리드 검색 |
-| Analyst | 수집 데이터 기반 분석 |
-| Visualizer | LLM이 pandas/matplotlib 코드를 생성·실행해 차트 이미지 생성 |
+### 3. 정기 수집과 경제·AI 테크 브리핑
+- Codex 기반 RSS 기사 내용 추출과 Tavily 기반 테마 검색을 분리합니다. 출처·발행 시각·수집 방식을 저장하고 KG 구축 전 정제·중복 선별을 수행합니다.
+- 예약 워커가 경제·주식 및 AI·테크 브리핑을 생성합니다. 일간 주요 변화와 주간 시장 흐름을 발행본으로 보존합니다.
+- AI·테크 소식은 기업 수요·비용·매출·경쟁 구도와 연결해 정리합니다. 원문 출처와 사실·해석을 구분해 읽을 수 있도록 구성합니다.
 
-### 3. WebSocket 스트리밍 프로토콜
-- 태그로 메시지 종류를 구분합니다: `SYSTEM`(진행 단계), `URLS`(참고 기사), `IMAGES`(차트), `MARKDOWN`(답변 토큰).
-- 클라이언트 ACK로 메시지 순서를 맞춥니다.
+### 4. 근거 기반 투자 토론과 개인 종목 분석
+- 기술 전환·사업 수익성·수요와 실적·거시 환경을 보는 네 관점이 2라운드로 토론하고, 중립 종합을 생성합니다.
+- 주장·반론·응답을 조회 근거와 연결하고 합의·이견을 구분합니다. 단계별 체크포인트로 중단 후 재개와 동일 회차 중복 발행을 제어합니다.
+- 보유·관심 종목은 일간 주요 발견과 주간 가설·연결 분석으로 제공합니다. 뉴스·KG·브리핑·토론과 공개 웹 조사를 함께 활용합니다.
+- 앱의 시장 화면에는 가격·금리·변동성 등의 저장된 스냅샷을 제공하고, 관측일과 비교 기준을 함께 표시합니다.
 
-### 4. 멀티턴 세션
-- 세션 히스토리를 다음 질문의 컨텍스트로 사용하고, 세션·메시지·차트를 저장해 다시 열람할 수 있습니다.
-
-### 5. 경제 Knowledge Graph
-- **Identity/State 2계층 스키마**: 고유 엔티티(회사, 지표 등)는 UPSERT하고, 시점별 사실(실적, 가격 변동 등)은 State로 INSERT해 시간축을 보존합니다.
-- **seed 카탈로그**: 회사, 미국 거시지표, 원자재·통화, 투자 테마, 실적·FOMC 일정을 미리 넣고 뉴스에서 추출한 사실을 연결합니다.
-- **질의 템플릿 도구**: LLM이 읽기 전용 Cypher 템플릿과 인자를 고르는 방식으로 그래프를 조회합니다.
-- **골든셋 평가**: 같은 질문 세트로 「ES만」과 「ES + KG」 조건을 비교해 KG의 효과를 측정합니다.
+### 5. MCP 연동과 사용량 관리
+- 읽기용 MCP 도구로 금융 KG, 뉴스, 주가·경제 지표, 브리핑·투자 토론을 조회합니다.
+- Claude Code·Codex의 사실 조회·심층 분석 스킬에서 저장된 근거를 수집해 리서치에 활용합니다.
+- Gemini 호출별 토큰과 추정 비용을 PostgreSQL에 저장하여 모델·작업별로 집계합니다.
 
 ## Data & Storage
 
 | 저장소 | 역할 |
 |---|---|
-| Elasticsearch | 경제 뉴스 색인, BM25 + 벡터 RRF 하이브리드 검색 |
-| Redis | 요청 중 에이전트 작업 메모리(수집 데이터, 기사, 실행 이력), 세션 대화 히스토리(TTL) |
-| PostgreSQL | 채팅 세션, 메시지, 질의 로그 |
-| GCS | Visualizer가 생성한 차트 이미지 |
-| Neo4j | 경제 Knowledge Graph |
-| InfluxDB | 거시지표(FRED), 원자재·통화 시세 시계열 |
-
-외부 데이터 소스: yfinance(주가·종목 뉴스), Tavily(웹·뉴스 검색), investing.com RSS, FRED
+| Elasticsearch | 경제 뉴스와 출처 메타데이터, 벡터·전문 검색 |
+| Redis | Agent 작업 메모리, 대화 맥락과 수집·처리 상태 |
+| PostgreSQL | 채팅, 브리핑·토론, 개인 포트폴리오·분석, 시장 스냅샷, 사용량 |
+| GCS | 리서치 과정에서 생성한 차트 이미지 |
+| Neo4j | 금융 엔티티·관계와 시점별 사실 |
+| InfluxDB | 거시지표·원자재·통화 시세 시계열 |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  APP["Flutter 웹/모바일 앱"] -->|"WebSocket /chat-stream"| R["FastAPI research_router"]
-  R --> M["Manager<br/>Facts Survey → Plan → Progress Ledger"]
-  M --> WS["WebSearcher"]
-  M --> DC["DataCollector"]
-  M --> AN["Analyst"]
-  M --> VZ["Visualizer"]
-  WS --> TAV(["Tavily"])
-  DC --> YF(["yfinance"])
-  DC --> ES[("Elasticsearch")]
-  VZ --> GCS[("GCS")]
-  M --> RD[("Redis")]
-  M --> PG[("PostgreSQL")]
-  subgraph PIPE["배치 파이프라인 (cron)"]
-    RSS["RSS 분류 + 테마 스윕"] --> TAV2(["Tavily"])
-    KGB["KG 빌드"] --> NEO[("Neo4j")]
-    IND["지표·시세 수집"] --> INF[("InfluxDB")]
-  end
-  TAV2 --> ES
-  ES --> KGB
+  APP["Flutter 앱"] --> API["FastAPI"]
+  API --> CHAT["계획·위임·분석·시각화"]
+  CHAT --> SEARCH["뉴스·KG·주가·지표 조회"]
+  CLI["Claude Code · Codex"] --> MCP["읽기 MCP"]
+  MCP --> SEARCH
+  NEWS["RSS 내용 추출 · 테마 검색"] --> ES[("Elasticsearch 뉴스")]
+  ES --> BUILD["정제 · KG 구축"]
+  BUILD --> KG[("Neo4j 금융 KG")]
+  IND["지표·시세 수집"] --> TS[("InfluxDB")]
+  SEARCH --> ES
+  SEARCH --> KG
+  SEARCH --> TS
+  WORKER["예약 브리핑 · 투자 토론 · 개인 분석"] --> SEARCH
+  WORKER --> WEB["공개 웹 조사"]
+  WORKER --> PG[("PostgreSQL 발행본·개인 데이터")]
+  MARKET["시장 스냅샷 수집"] --> PG
+  API --> PG
 ```
 
 ## Challenges
 
 1. **질문마다 다른 분석 경로**
-   - 문제: 고정 파이프라인으로는 단순 시세 질문과 복합 분석 질문을 함께 처리할 수 없었습니다.
-   - 해결: Progress Ledger로 매 단계 다음 담당자를 동적으로 정하고, 진행·반복 여부를 판단하는 stall 감지로 무한 루프를 막았습니다.
-2. **에이전트 간 실행 순서 제약**
-   - 문제: 데이터 없이 분석이나 시각화가 먼저 실행되면 근거 없는 내용이 만들어졌습니다.
-   - 해결: 에이전트별 의존성(AND/OR 조합)을 선언하고, 위임 전에 실행 이력으로 검사했습니다.
-3. **뉴스 수집 차단**
-   - 문제: 기사 페이지를 직접 크롤링하는 방식이 봇 차단에 막혔습니다.
-   - 해결: RSS 제목을 LLM이 분류해 관련 기사만 Tavily로 검색하는 트랙과, 고정 테마 스윕 트랙으로 수집 구조를 바꿨습니다.
-4. **KG 컨텍스트 과다**
-   - 문제: 벡터로 진입한 엔티티의 주변을 통째로 펼치면 컨텍스트가 평균 1.37만 자가 되어 핵심 수치를 놓쳤습니다.
-   - 해결: 질문 유형별 질의 템플릿을 도구로 노출해 컨텍스트를 평균 약 2.5천 자(약 1/5)로 줄였고, 골든셋 20문항에서 사실 재현율은 같은 수준을 유지했습니다.
+   - 고정 순서 대신 진행 상황에 따라 다음 담당 Agent를 선택하고, 선행 자료가 없는 분석·시각화와 반복 실행을 제어했습니다.
+2. **뉴스 원문 접근과 수집 비용**
+   - RSS 기반 내용 추출과 테마 검색을 독립 운영하여 누락을 보완합니다. 정제 내용에 출처·시각·수집 방식을 남겨 원문과 구분합니다.
+3. **KG 컨텍스트의 과도한 확장**
+   - 읽기 템플릿을 도구로 제공해 질문별 필요한 사실을 선택했습니다. 2026-10-04의 20문항 비교 실행에서 평균 KG 컨텍스트는 13,740자에서 2,693자로 줄었고, 사실 재현율은 0.88에서 0.86이었습니다. 이 수치는 해당 고정 질문·데이터의 평가 결과입니다.
+4. **투자 토론의 주장과 반론 추적**
+   - 발언 요약만 저장하지 않고 주장·반론 ID와 근거를 연결했습니다. 다음 라운드에서 반론에 응답하도록 검증하고 최종 이견을 보존합니다.
+5. **정기 실행의 중단과 중복 발행**
+   - 실행 임대와 단계별 체크포인트를 사용해 완료된 작업을 재사용하고, 같은 회차를 중복 발행하지 않도록 구성했습니다.
 
 ## Tech Stack
 
 | 영역 | 기술 |
 |---|---|
-| AI | Gemini, Multi-Agent Orchestration, Graph RAG |
-| Backend | Python, FastAPI, WebSocket |
+| AI | Gemini, Codex, Multi-Agent Orchestration, Graph RAG, MCP |
+| Backend | Python, FastAPI, WebSocket, Tavily |
 | Data | Elasticsearch, Redis, PostgreSQL, Neo4j, InfluxDB, GCS |
 | Infra | GCP, Docker, Cloud Build, cron |
-| Frontend | Flutter (웹/모바일) |
+| Frontend | Flutter 웹·모바일 |
