@@ -275,6 +275,7 @@ title: Portfolio - Hyunmin Jeon
             <ul>
               <li>경제·AI 테크 일간 브리핑과 주간 시장 분석</li>
               <li>Bull/Bear 관점의 토론에서 주장·반론과 근거를 연결</li>
+              <li>AI slop을 줄이기 위한 보고서 가독성·두괄식 구성 개선 및 결과물 기반 후속 대화 Agent 통합</li>
             </ul>
           </li>
           <li>개인 종목 분석과 시장 현황
